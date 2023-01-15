@@ -54,7 +54,12 @@ TAG=$(githubLatestTag $1)
 OUTPUT_FILE=`echo "$2" | sed -n '{s@.*/@@; p}'`
 printf "Package: %s\n" "$1"
 printf "Latest Version: %s\n" "$TAG"
-if [ "$2" = "toolchain-riscv32i.tar.gz" ]; then
+if [ "$2" = "verilog-format.jar" ]; then
+  URL_FILE="https://github.com/$1/releases/download/$TAG/verilog-format.jar"
+  printf "Downloading $URL_FILE"
+  curl -L "$URL_FILE" > "$2"
+  printf "\n"
+elif [ "$2" = "toolchain-riscv32i.tar.gz" ]; then
   URL_FILE="https://github.com/$1/releases/download/$TAG/riscv32i-$TAG.tar.gz"
   printf "Downloading $URL_FILE"
   curl -L "$URL_FILE" > "$2"
