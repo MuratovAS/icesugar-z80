@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/firmware/include",
+                "/opt/fpga/sdcc-4.0.0/share/sdcc/include/**"
+            ],
+            "defines": [],
+            "cStandard": "gnu99",
+            "compilerPath": ""
+        }
+    ],
+    "version": 4
+}

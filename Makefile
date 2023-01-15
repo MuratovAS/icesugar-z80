@@ -34,9 +34,9 @@ BUILD_DIR = build
 TOOLCHAIN_PATH := $(shell echo $$(readlink -f $(TOOLCHAIN_PATH)))
 PATH := $(shell echo $(TOOLCHAIN_PATH)/*/bin | sed 's/ /:/g'):$(PATH)
 
-all: build_fw  synthesis
+all:  synthesis
 
-synthesis: $(BUILD_DIR) $(BUILD_DIR)/$(PROJ).bin
+synthesis: $(BUILD_DIR) build_fw $(BUILD_DIR)/$(PROJ).bin
 # rules for building the blif file
 $(BUILD_DIR)/%.json: $(TOP_FILE) $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
 	yosys -q  -f "verilog -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fw.vhex\"" -l $(BUILD_DIR)/build.log -p '$(SERIES) $(YOSYS_ARG) -top top -json $@; show -format dot -prefix $(BUILD_DIR)/$(PROJ)' $< 
@@ -102,7 +102,8 @@ toolchain:
 	chmod +x ./toolchain/*.sh
 	sudo ./toolchain/install.sh $(TOOLCHAIN_PATH)
 	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.path\":\)[^,]*@\1 "${TOOLCHAIN_PATH}/toolchain-iverilog/bin/"@' .vscode/settings.json; fi
-	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.iverilog.arguments\":\)[^,]*@\1 "-B ${TOOLCHAIN_PATH}/toolchain-iverilog/lib/ivl"@' .vscode/settings.json; fi
+	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.iverilog.arguments\":\)[^,]*@\1 "-B ${TOOLCHAIN_PATH}/toolchain-iverilog/lib/ivl ${TOOLCHAIN_PATH}/toolchain-yosys/share/yosys/ice40/cells_sim.v"@' .vscode/settings.json; fi
+	if [ -d ".vscode" ]; then sed -i 's@[$$"].*/sdcc-4.0.0@"${TOOLCHAIN_PATH}/sdcc-4.0.0@' .vscode/c_cpp_properties.json; fi
 
 #secondary needed or make will remove useful intermediate files
 .SECONDARY:

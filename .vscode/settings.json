@@ -1,7 +1,7 @@
 {
     "verilog.linting.linter": "iverilog",
     "verilog.linting.path": "/opt/fpga/toolchain-iverilog/bin/",
-    "verilog.linting.iverilog.arguments": "-B /opt/fpga/toolchain-iverilog/lib/ivl",
+    "verilog.linting.iverilog.arguments": "-B /opt/fpga/toolchain-iverilog/lib/ivl /opt/fpga/toolchain-yosys/share/yosys/ice40/cells_sim.v",
     "VsCodeTaskButtons.showCounter": false,
     "VsCodeTaskButtons.tasks": [
         {
@@ -29,8 +29,5 @@
             "label": "$(notebook-delete-cell) Clean",
             "task": "PRJ: clean",
         },
-    ],
-    "files.associations": {
-        "mini-printf.h": "c"
-    }
+    ]
 }
