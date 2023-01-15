@@ -1,0 +1,74 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PRJ: make",
+            "type": "shell",
+            "command": "make",
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: synthesis",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "synthesis"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: simulator",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "sim"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: flash",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "flash"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: formatter",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "formatter"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: build fw",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "build_fw"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "PRJ: clean",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "SYS: install toolchain",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "toolchain"
+            ],
+            "problemMatcher": []
+        },
+    ]
+  }
