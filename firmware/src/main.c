@@ -174,9 +174,6 @@ void main ()
             case 'z':
                 snprintf(strbuf, sizeof(strbuf), "start z\n\r");
                 uart_write(strbuf);
-                port_a = 0x01;
-                View_Memory(0x0000, 0xFFFF);
-                port_a = 0x02;
                 View_Memory(0x0000, 0xFFFF);
             break;
             case 't':
@@ -203,4 +200,18 @@ void main ()
                 break;
         }
     }
+}
+
+void im1_isr(void) __interrupt
+{
+    port_a = 0b111;
+    snprintf(strbuf, sizeof(strbuf), "im1_isr\r\n");
+    uart_write(strbuf);
+}
+
+void nmi_isr(void) __critical __interrupt
+{
+    port_a = 0b000;
+    snprintf(strbuf, sizeof(strbuf), "nmi_isr\r\n");
+    uart_write(strbuf);
 }

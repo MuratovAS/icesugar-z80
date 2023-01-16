@@ -31,6 +31,8 @@ stacktop = #0xFFFF
 
             .module crt0
             .globl	_main
+            .globl  _im1_isr
+            .globl  _nmi_isr
 
             .area	_HEADER (ABS)
 
@@ -50,8 +52,11 @@ stacktop = #0xFFFF
             reti
             .org	0x30
             reti
+
             .org	0x38
-            reti
+            jp _im1_isr
+            .org	0x66
+            jp _nmi_isr
 
             .org	0x100
 init:

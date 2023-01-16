@@ -36,9 +36,9 @@ PATH := $(shell echo $(TOOLCHAIN_PATH)/*/bin | sed 's/ /:/g'):$(PATH)
 
 all:  synthesis
 
-synthesis: $(BUILD_DIR) build_fw $(BUILD_DIR)/$(PROJ).bin
+synthesis: $(BUILD_DIR) $(BUILD_DIR)/$(PROJ).bin
 # rules for building the blif file
-$(BUILD_DIR)/%.json: $(TOP_FILE) $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
+$(BUILD_DIR)/%.json: $(TOP_FILE) build_fw $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
 	yosys -q  -f "verilog -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fw.vhex\"" -l $(BUILD_DIR)/build.log -p '$(SERIES) $(YOSYS_ARG) -top top -json $@; show -format dot -prefix $(BUILD_DIR)/$(PROJ)' $< 
 # asc
 $(BUILD_DIR)/%.asc: $(BUILD_DIR)/%.json $(PIN_DEF)
@@ -77,9 +77,9 @@ build_fw: $(BUILD_DIR) $(BUILD_DIR)/$(PROJ)_fw.bin $(BUILD_DIR)/$(PROJ)_fw.hex $
 CC = sdcc -$(ARCH) --std-sdcc99 --max-allocs-per-node 10000 --opt-code-size --code-loc $(CODE_LOCATION) --data-loc $(DATA_LOCATION)
 ASM_OBJ = $(patsubst %.s,$(BUILD_DIR)/%.rel,$(FW_ASM_FILE))
 CC_OBJ = $(patsubst %.c,$(BUILD_DIR)/%.rel,$(FW_SRC_FILE))
-$(ASM_OBJ): 
+$(ASM_OBJ): $(FW_DIR)/*.s
 	sdasz80 -go $@ $(subst .rel,.s, $(subst $(BUILD_DIR),$(FW_DIR),$@))
-$(CC_OBJ):
+$(CC_OBJ): $(FW_SRC)/*c $(FW_INCLUDE)/*
 	$(CC) -I $(FW_INCLUDE) -c $(subst .rel,.c, $(subst $(BUILD_DIR),$(FW_SRC),$@) ) -o $@
 # Linker
 $(BUILD_DIR)/$(PROJ)_fw.hex: $(ASM_OBJ) $(CC_OBJ)
@@ -102,7 +102,7 @@ toolchain:
 	chmod +x ./toolchain/*.sh
 	sudo ./toolchain/install.sh $(TOOLCHAIN_PATH)
 	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.path\":\)[^,]*@\1 "${TOOLCHAIN_PATH}/toolchain-iverilog/bin/"@' .vscode/settings.json; fi
-	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.iverilog.arguments\":\)[^,]*@\1 "-B ${TOOLCHAIN_PATH}/toolchain-iverilog/lib/ivl ${TOOLCHAIN_PATH}/toolchain-yosys/share/yosys/ice40/cells_sim.v"@' .vscode/settings.json; fi
+	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.iverilog.arguments\":\)[^,]*@\1 "-B ${TOOLCHAIN_PATH}/toolchain-iverilog/lib/ivl ${TOOLCHAIN_PATH}/toolchain-yosys/share/yosys/ice40/cells_sim.v src/top.v"@' .vscode/settings.json; fi
 	if [ -d ".vscode" ]; then sed -i 's@[$$"].*/sdcc-4.0.0@"${TOOLCHAIN_PATH}/sdcc-4.0.0@' .vscode/c_cpp_properties.json; fi
 
 #secondary needed or make will remove useful intermediate files
