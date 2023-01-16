@@ -26,18 +26,26 @@
 `include "src/iceZ0mb1e.v"
 
 module top(
-	output uart_txd,
 	input uart_rxd,
+	output uart_txd,
+
+    output spi_cs,
+	output spi_sclk,
+	output spi_mosi,
+	input  spi_miso,
+	
+	output i2c_scl,
+	inout i2c_sda,
+	output oled_rst,
+	
 	output LED_R,
 	output LED_G,
 	output LED_B,
-	output oled_rst,
-	output i2c_scl,
-	inout i2c_sda,
-    output spi_sclk,
-	output spi_mosi,
-	input  spi_miso,
-    output spi_cs
+	
+	input SW_1,
+	input SW_2,
+	input SW_3,
+	input SW_4
 );
 
 	wire clk;
@@ -82,20 +90,24 @@ module top(
 		.clk		(clk),
 		.uart_txd	(uart_txd),
 		.uart_rxd	(uart_rxd),
+    	.spi_cs		(spi_cs),
+    	.spi_sclk	(spi_sclk),
+		.spi_mosi	(spi_mosi),
+		.spi_miso	(spi_miso),
 		.i2c_scl	(i2c_scl),
 		.i2c_sda_in	(i2c_sda_in),
 		.i2c_sda_out	(i2c_sda_out),
 		.i2c_sda_oen	(i2c_sda_oen),
-    	.spi_sclk	(spi_sclk),
-		.spi_mosi	(spi_mosi),
-		.spi_miso	(spi_miso),
-    	.spi_cs		(spi_cs),
 		.P1_out		(P1_out),
 		.P1_in		(8'h55),
 		.P1_oen		(),
 		.P2_out		(P2_out),
 		.P2_in		(8'hAA),
 		.P2_oen		(),
+		.SW_1		(SW_1),
+		.SW_2		(SW_2),
+		.SW_3		(SW_3),
+		.SW_4		(SW_4),
 		.debug		()
 	);
 	defparam core.RAM_TYPE = 1; // 0 => BRAM, 1 => SPRAM (UltraPlus)

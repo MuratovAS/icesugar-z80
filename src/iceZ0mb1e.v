@@ -55,6 +55,10 @@ module iceZ0mb1e  #(
     output[7:0] P2_out,
     input[7:0] P2_in,
     output P2_oen,
+	input SW_1,
+	input SW_2,
+	input SW_3,
+	input SW_4,
 	output debug
 );
 	localparam ROM_SIZE = (1 << ROM_WIDTH);
@@ -90,13 +94,21 @@ module iceZ0mb1e  #(
 
 	//Reset Controller:
 	always @(posedge clk) begin
-		if( reset_n == 1'b0 ) begin
-			wait_n	<= 1'b1;
-			int_n	<= 1'b1;
-			nmi_n	<= 1'b1;
-			busrq_n	<= 1'b1;
-			reset_n	<= 1'b1;
-		end
+		if( reset_n == 1'b0 ) 
+			begin
+				wait_n	<= 1'b1;
+				int_n	<= 1'b1;
+				nmi_n	<= 1'b1;
+				busrq_n	<= 1'b1;
+				reset_n	<= 1'b1;
+			end
+		else
+			begin
+				wait_n	<= SW_1;
+				int_n	<= SW_2;
+				nmi_n	<= SW_3;
+				busrq_n	<= SW_4;
+			end
 	end
 
 	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n;

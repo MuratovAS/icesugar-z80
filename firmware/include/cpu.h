@@ -31,5 +31,8 @@
 void cpu_reset();
 void cpu_nop();
 void delay(uint16_t t);
+void cpu_ei();
+void cpu_di();
+void cpu_im(uint8_t p);
 
 #endif

@@ -40,13 +40,53 @@ __asm
 __endasm;
 }
 
+void cpu_ei()
+{
+__asm
+    ei
+__endasm;
+}
+
+void cpu_di()
+{
+__asm
+    di
+__endasm;
+}
+
+void cpu_im(uint8_t p)
+{
+    switch (p) {
+    case 0:
+        __asm
+            im 0
+        __endasm;
+        break;
+    case 1:
+        __asm
+            im 1
+        __endasm;
+        break;
+    case 2:
+        __asm
+            im 2
+        __endasm;
+        break;
+    default:
+        __asm
+            im 1
+        __endasm;
+    }
+}
+
+
 void delay(uint16_t t)
 {
     uint16_t i;
     for(i = 0; i < t; i++)
     {
-__asm
-    nop
-__endasm;
+        __asm
+            nop
+        __endasm;
     }
 }

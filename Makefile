@@ -36,7 +36,7 @@ PATH := $(shell echo $(TOOLCHAIN_PATH)/*/bin | sed 's/ /:/g'):$(PATH)
 
 all:  synthesis
 
-synthesis: $(BUILD_DIR) $(BUILD_DIR)/$(PROJ).bin
+synthesis: $(BUILD_DIR)/$(PROJ).bin
 # rules for building the blif file
 $(BUILD_DIR)/%.json: $(TOP_FILE) build_fw $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
 	yosys -q  -f "verilog -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fw.vhex\"" -l $(BUILD_DIR)/build.log -p '$(SERIES) $(YOSYS_ARG) -top top -json $@; show -format dot -prefix $(BUILD_DIR)/$(PROJ)' $< 
@@ -50,7 +50,7 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.asc
 $(BUILD_DIR)/%.rpt: $(BUILD_DIR)/%.asc
 	icetime -d $(DEVICE) -mtr $@ $<
 
-sim: $(BUILD_DIR) build_fw $(BUILD_DIR)/%.vcd  
+sim: build_fw $(BUILD_DIR)/%.vcd  
 $(BUILD_DIR)/%.vcd: $(BUILD_DIR)/$(PROJ).out 
 	vvp -v -M $(TOOLCHAIN_PATH)/toolchain-iverilog/lib/ivl $< 
 	mv ./*.vcd $(BUILD_DIR)
@@ -71,7 +71,7 @@ formatter:
 	if [ $(FORMAT) == "verilog-format" ]; then find ./src/*.v | xargs -t -L1 java -jar ${TOOLCHAIN_PATH}/verilog-format/bin/verilog-format.jar -s .verilog-format -f ; fi
 	
 #FIXME:
-build_fw: $(BUILD_DIR) $(BUILD_DIR)/$(PROJ)_fw.bin $(BUILD_DIR)/$(PROJ)_fw.hex $(BUILD_DIR)/$(PROJ)_fw.vhex
+build_fw: $(BUILD_DIR)/$(PROJ)_fw.bin $(BUILD_DIR)/$(PROJ)_fw.hex $(BUILD_DIR)/$(PROJ)_fw.vhex
 #build_fw: $(ASM_OBJ) $(CC_OBJ)
 # Compile Files
 CC = sdcc -$(ARCH) --std-sdcc99 --max-allocs-per-node 10000 --opt-code-size --code-loc $(CODE_LOCATION) --data-loc $(DATA_LOCATION)

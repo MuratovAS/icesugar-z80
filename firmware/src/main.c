@@ -98,7 +98,6 @@ void main ()
     uint8_t buffer[64];
     int8_t uart_rx = 0;
     int16_t x;
-        
 
     //GPIO mode = output
     port_cfg = 0x00;
@@ -139,6 +138,13 @@ void main ()
 
     //Port test
     port_a = 0x02;
+    delay(24000);
+    port_a = 0x03;
+    delay(24000);
+    port_a = 0x02;
+
+    //Interrupt mode
+    cpu_im(1);
 
     //UART Test
     snprintf(strbuf, sizeof(strbuf), "iceZ0mb1e SoC\r\n");
@@ -196,13 +202,15 @@ void main ()
                 uart_write(strbuf);
                 break;
             default:
+                //cpu_im(1);
+                cpu_ei();
                 putchar(uart_rx);
                 break;
         }
     }
 }
 
-void im1_isr(void) __interrupt
+void im1_isr(void)  //__interrupt BUG:
 {
     port_a = 0b111;
     snprintf(strbuf, sizeof(strbuf), "im1_isr\r\n");

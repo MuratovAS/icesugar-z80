@@ -55,6 +55,8 @@ stacktop = #0xFFFF
 
             .org	0x38
             jp _im1_isr
+            reti
+            
             .org	0x66
             jp _nmi_isr
 
