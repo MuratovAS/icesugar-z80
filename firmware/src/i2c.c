@@ -23,10 +23,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include <stdint.h>
 #include "icez0mb1e.h"
 #include "i2c.h"
-#include "cpu.h"
 
 #define I2C_ADDR_WR     0x00
 #define I2C_ADDR_RD     0x01

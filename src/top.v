@@ -69,6 +69,8 @@ module top(
 		oled_rst <= P2_out[0];
 	end
 
+	reg [3:0] SW = {SW_4, SW_3, SW_2, SW_1};
+
 	//Source = 48MHz, CLKHF_DIV = 2’b00 : 00 = div1, 01 = div2, 10 = div4, 11 = div8 ; Default = “00”
 	SB_HFOSC #(.CLKHF_DIV("0b10")) osc (
 		.CLKHFPU(1'b1),
@@ -104,10 +106,7 @@ module top(
 		.P2_out		(P2_out),
 		.P2_in		(8'hAA),
 		.P2_oen		(),
-		.SW_1		(SW_1),
-		.SW_2		(SW_2),
-		.SW_3		(SW_3),
-		.SW_4		(SW_4),
+		.SW			(SW),
 		.debug		()
 	);
 	defparam core.RAM_TYPE = 1; // 0 => BRAM, 1 => SPRAM (UltraPlus)

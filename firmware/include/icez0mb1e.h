@@ -27,6 +27,11 @@
 #define __ICEZOMB1E_H
 
 #include <stdint.h>
+#include "mini-printf.h"
+#include "mini-string.h"
+#include "cpu.h"
+
+extern char strbuf[80];
 
 #define SYS_XTAL_FREQ   12E6
 

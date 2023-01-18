@@ -30,6 +30,7 @@
 `include "src/simplespi_wrapper.v"
 `include "src/simpleuart_wrapper.v"
 `include "src/simpleio.v"
+`include "src/simpleirq.v"
 `include "src/tv80/tv80s.v"
 
 module iceZ0mb1e  #(
@@ -55,10 +56,7 @@ module iceZ0mb1e  #(
     output[7:0] P2_out,
     input[7:0] P2_in,
     output P2_oen,
-	input SW_1,
-	input SW_2,
-	input SW_3,
-	input SW_4,
+	input[3:0] SW,
 	output debug
 );
 	localparam ROM_SIZE = (1 << ROM_WIDTH);
@@ -67,9 +65,11 @@ module iceZ0mb1e  #(
 	//Z80 Bus:
 	reg         reset_n = 1'b0;
 	reg         wait_n = 1'b0;
-	reg         int_n = 1'b0;
 	reg         nmi_n = 1'b0;
 	reg         busrq_n = 1'b0;
+	reg         sys_int_n = 1'b0;
+
+	wire        int_n;
 	wire        m1_n;
 	wire        mreq_n;
 	wire        iorq_n;
@@ -88,30 +88,27 @@ module iceZ0mb1e  #(
 	wire [7:0] data_miso_uart;
 	wire [7:0] data_miso_i2c;
 	wire [7:0] data_miso_spi;
-	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
-			data_miso_uart | data_miso_i2c | data_miso_spi;
+	wire [7:0] data_miso_irq;
+	wire       irq_int_n;
 
+	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
+			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq;
+
+	assign int_n = irq_int_n & sys_int_n;
 
 	//Reset Controller:
 	always @(posedge clk) begin
 		if( reset_n == 1'b0 ) 
 			begin
-				wait_n	<= 1'b1;
-				int_n	<= 1'b1;
-				nmi_n	<= 1'b1;
-				busrq_n	<= 1'b1;
-				reset_n	<= 1'b1;
-			end
-		else
-			begin
-				wait_n	<= SW_1;
-				int_n	<= SW_2;
-				nmi_n	<= SW_3;
-				busrq_n	<= SW_4;
+				wait_n		<= 1'b1;
+				nmi_n		<= 1'b1;
+				busrq_n		<= 1'b1;
+				reset_n		<= 1'b1;
+				sys_int_n	<= 1'b1;
 			end
 	end
 
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n;
+	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, irq_cs_n;
 	wire rom_cs_n, ram_cs_n;
 
 	//I/O Address Decoder:
@@ -119,6 +116,7 @@ module iceZ0mb1e  #(
 	assign port_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01000)); // PORT base 0x40
 	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
 	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
+	assign irq_cs_n = ~(!iorq_n & !m1_n);
 	//Memory Address Decoder:
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
@@ -199,6 +197,16 @@ generate
 		);
 	end
 endgenerate
+
+	simpleirq irq 
+	(
+		.clk		(clk),
+		.m1_n		(m1_n),
+		.cs_n		(irq_cs_n),
+		.int_n		(irq_int_n),
+		.data_out	(data_miso_irq),
+		.irq		(SW)
+	);
 
 	simpleio ioporta
 	(

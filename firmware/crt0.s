@@ -29,74 +29,93 @@
 
 stacktop = #0xFFFF
 
-            .module crt0
-            .globl	_main
-            .globl  _im1_isr
-            .globl  _nmi_isr
+			.module crt0
+			.globl	_main
+			.globl	_isr1
+			.globl	_isr2
+			.globl	_isr3
+			.globl	_isr4
+			.globl	_isr5
+			.globl	_isr6
+			.globl	_isr7
+			.globl	_isrn
 
-            .area	_HEADER (ABS)
+			.area	_HEADER (ABS)
 
-            ;; Reset vector
-            .org 	0
-            jp	init
+			;; Reset vector ;;irq0 low priority
+			.org 	0x00
+			im 0
+			jp	init
+			;;irq1
+			.org	0x08
+			jp	_isr1
+			reti
+			;;irq2
+			.org	0x10
+			jp	_isr2
+			reti
+			;;irq3
+			.org	0x18
+			jp	_isr3
+			reti
+			;;irq4
+			.org	0x20
+			jp	_isr4
+			reti
+			;;irq5
+			.org	0x28
+			jp	_isr5
+			reti
+			;;irq6
+			.org	0x30
+			jp	_isr6
+			reti
+			;;im1 or irq7 top priority
+			.org	0x38
+			jp	_isr7
+			reti
+			;;nmi
+			.org	0x66
+			jp	_isrn
 
-            .org	0x08
-            reti
-            .org	0x10
-            reti
-            .org	0x18
-            reti
-            .org	0x20
-            reti
-            .org	0x28
-            reti
-            .org	0x30
-            reti
-
-            .org	0x38
-            jp _im1_isr
-            reti
-            
-            .org	0x66
-            jp _nmi_isr
-
-            .org	0x100
+			.org	0x100
 init:
-            ld	sp,#stacktop                    ;; Stack at the top of memory.
+			;; Stack at the top of memory.
+			ld	sp,#stacktop
 
-;; Initialise global variables
-            call    gsinit
-            call	_main
-            jp	_exit
+			;; Initialise global variables
+			call    gsinit
+			call	_main
+			jp	_exit
 
-;; Ordering of segments for the linker.
-            .area	_HOME
-            .area	_CODE
-            .area   _GSINIT
-            .area   _GSFINAL
+			;; Ordering of segments for the linker.
+			.area	_HOME
+			.area	_CODE
+			.area   _GSINIT
+			.area   _GSFINAL
 
-            .area	_DATA
-            .area	_BSEG
-            .area   _BSS
-            .area   _HEAP
+			.area	_DATA
+			.area	_BSEG
+			.area   _BSS
+			.area   _HEAP
 
-            .area   _CODE
+			.area   _CODE
 
 __clock::
-            ld	a,#2
-            rst     0x08
-            ret
+			ld	a,#2
+			rst	0x08
+			ret
 
 _exit::
-            ;; Exit - special code to the emulator
-            ld	a,#0
-            rst     0x08
-            1$:
-            halt
-            jr	1$
+			;; Exit - special code to the emulator
+			ld	a,#0
+			rst	0x08
+			1$:
+			halt
+			jr	1$
 
 .area   _GSINIT
-            gsinit::
+			gsinit::
 
 .area   _GSFINAL
-            ret
+			ret

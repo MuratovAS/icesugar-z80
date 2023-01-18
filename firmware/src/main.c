@@ -23,10 +23,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include <stdint.h>
-#include "mini-printf.h"
 #include "icez0mb1e.h"
-#include "cpu.h"
+#include "mini-printf.h"
 #include "uart.h"
 #include "i2c.h"
 #include "spi.h"
@@ -137,15 +135,17 @@ void main ()
 #endif
 
     //Port test
-    port_a = 0x02;
+    port_a = 0b00000001; //R
     delay(24000);
-    port_a = 0x03;
+    port_a = 0b00000010; //G
     delay(24000);
-    port_a = 0x02;
-
-    //Interrupt mode
-    cpu_im(1);
-
+    port_a = 0b00000100; //B
+    delay(24000);
+    port_a = 0b00000000;
+    delay(24000);
+    //Interrupt en
+    cpu_ei();
+    
     //UART Test
     snprintf(strbuf, sizeof(strbuf), "iceZ0mb1e SoC\r\n");
     uart_write(strbuf);
@@ -202,24 +202,9 @@ void main ()
                 uart_write(strbuf);
                 break;
             default:
-                //cpu_im(1);
                 cpu_ei();
                 putchar(uart_rx);
                 break;
         }
     }
-}
-
-void im1_isr(void)  //__interrupt BUG:
-{
-    port_a = 0b111;
-    snprintf(strbuf, sizeof(strbuf), "im1_isr\r\n");
-    uart_write(strbuf);
-}
-
-void nmi_isr(void) __critical __interrupt
-{
-    port_a = 0b000;
-    snprintf(strbuf, sizeof(strbuf), "nmi_isr\r\n");
-    uart_write(strbuf);
 }
