@@ -19,3 +19,12 @@ set_io SW_1 18
 set_io SW_2 19
 set_io SW_3 20
 set_io SW_4 21
+
+set_io DEBUG_0 46 
+set_io DEBUG_1 44
+set_io DEBUG_2 42
+set_io DEBUG_3 37
+set_io DEBUG_4 45
+set_io DEBUG_5 43
+set_io DEBUG_6 38
+set_io DEBUG_7 36

@@ -45,13 +45,24 @@ module top(
 	input SW_1,
 	input SW_2,
 	input SW_3,
-	input SW_4
+	input SW_4,
+
+	output DEBUG_0,
+	output DEBUG_1,
+	output DEBUG_2,
+	output DEBUG_3,
+	output DEBUG_4,
+	output DEBUG_5,
+	output DEBUG_6,
+	output DEBUG_7
 );
 
 	wire clk;
 
 	wire[7:0] P1_out;
 	wire[7:0] P2_out;
+	wire [3:0] SW;
+	wire [7:0] DEBUG;
 
 	wire i2c_scl;
 	wire i2c_sda_out;
@@ -69,7 +80,8 @@ module top(
 		oled_rst <= P2_out[0];
 	end
 
-	reg [3:0] SW = {SW_4, SW_3, SW_2, SW_1};
+	assign SW = {SW_4, SW_3, SW_2, SW_1};
+	assign DEBUG = {DEBUG_7, DEBUG_6, DEBUG_5, DEBUG_4, DEBUG_3, DEBUG_2, DEBUG_1, DEBUG_0};
 
 	//Source = 48MHz, CLKHF_DIV = 2’b00 : 00 = div1, 01 = div2, 10 = div4, 11 = div8 ; Default = “00”
 	SB_HFOSC #(.CLKHF_DIV("0b10")) osc (
@@ -107,7 +119,7 @@ module top(
 		.P2_in		(8'hAA),
 		.P2_oen		(),
 		.SW			(SW),
-		.debug		()
+		.debug		(DEBUG)
 	);
 	defparam core.RAM_TYPE = 1; // 0 => BRAM, 1 => SPRAM (UltraPlus)
 	

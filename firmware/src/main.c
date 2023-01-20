@@ -174,6 +174,9 @@ void main ()
             case 'c':
                 View_Memory((uint8_t*)SYS_ROM_ADDR, SYS_ROM_SIZE);
                 break;
+            case 'd':
+                View_Memory((uint8_t*)SYS_ROM_ADDR, 0x0200);
+                break;
             case 'm':
                 View_Memory((uint8_t*)SYS_RAM_ADDR, SYS_RAM_SIZE);
                 break;
