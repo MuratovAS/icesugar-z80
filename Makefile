@@ -3,8 +3,8 @@ PROJ = icesugar-z80
 PACKAGE = sg48
 DEVICE = up5k
 SERIES = synth_ice40
-YOSYS_ARG = -dsp
-#ROUTE_ARG = --seed 10 --freq 12
+YOSYS_ARG = -dsp -abc2
+ROUTE_ARG = --seed 10 --freq 12
 PROGRAMMER = icesprog
 
 # ----------------------------------------------------------------------------------
