@@ -24,14 +24,18 @@
 
 module simpledma (
     input clk,
-    input cs_n,
     input reset_n,
+    //input en_n,
+    //output[7:0] data_cfg_out,
+    //input[7:0] data_cfg_in,
     
     input busak_n,
     output busrq_n,
     
-    input[7:0] data_in,
+
+    input en_n,
     output[7:0] data_out,
+    input[7:0] data_in,
     output[15:0] addr_out,
 
     output iorq_n,
@@ -43,25 +47,25 @@ module simpledma (
     reg[7:0] data;
     reg[15:0] addr;
 
-    reg iorq = 1'b1;
-    reg mreq = 1'b1;
-    reg rd   = 1'b1;
-    reg wr   = 1'b1;
+    reg iorq = 1'b0;
+    reg mreq = 1'b0;
+    reg rd   = 1'b0;
+    reg wr   = 1'b0;
     
-    assign busrq_n  = ~(!cs_n);
-
-    //assign debug  = addr_out;
+    //FIXME:
+    assign busrq_n  = ~(!en_n);
+    assign debug = tmp;
 
     wire permission;
-    assign permission = !cs_n && !busak_n;
+    assign permission = !en_n && !busak_n;
 
-    assign iorq_n   = permission ? iorq : 1'b1;
-    assign mreq_n   = permission ? mreq : 1'b1;
-    assign rd_n     = permission ? rd : 1'b1;
-    assign wr_n     = permission ? wr : 1'b1;
+    assign iorq_n   = permission ? ~iorq : 1'b1;
+    assign mreq_n   = permission ? ~mreq : 1'b1;
+    assign rd_n     = permission ? ~rd : 1'b1;
+    assign wr_n     = permission ? ~wr : 1'b1;
     
-    assign data_out = permission ? data : 8'h0;
-    assign addr_out = permission ? addr : 16'h0;
+    assign data_out = permission && rd_n && !wr_n ? data : 8'h0;
+    assign addr_out = permission && (!rd_n || !wr_n) ? addr : 16'h0;
 
     reg[7:0] tmp;
     reg[7:0] n;
@@ -69,56 +73,16 @@ module simpledma (
 	begin
         if(permission)
         begin
-            mreq <= 1'b1;
             case(n)
-            0: data <= 16'h0201;
-            1: addr <= 16'h0201;
-
-            3: data <= 16'h0200;
-            4: addr <= 16'h0200;
-            
-             /*0 : addr <= 16'h0201;
-             10 : rd <= 1'b1; 
-             20 : tmp <= data_in;
-             30 : rd <= 1'b0;
-             40 : addr <= 16'h01F0;
-             50 : data <= tmp;
-             60 : wr <= 1'b1;*/
+             0 : iorq <= 1'b1;
+             1 : addr <= 16'b0000000001000000;
+             2 : data <= 8'h02;
+             3 : wr <= 1'b1;
+             4 : wr <= 1'b0;
+             5 : iorq <= 1'b0;
             endcase
             n <= n + 1;
         end
 	end
 
-    /*assign debug  = n;
- 
-    assign busrq_n  = ~(!cs_n);
-    assign permission = !busrq_n && !busak_n && reset_n;
-    
-    assign iorq_n   = permission ? iorq : 1'b1;
-    assign mreq_n   = permission ? mreq : 1'b1;
-    assign rd_n     = permission ? rd : 1'b1;
-    assign wr_n     = permission ? wr : 1'b1;
-
-    assign data_out = permission ? data : 8'h0;
-    assign addr_out = permission ? addr : 16'h0;
-
-    reg [7:0] n = 8'b0;
-    always @(posedge clk)
-	begin
-        if(permission)
-        begin
-            //mreq <= 1'b1;
-            // case(n)
-            // 0 : addr <= 16'h0200;
-            // 10 : rd <= 1'b1; 
-            // 20 : tmp <= data_in;
-            // 30 : rd <= 1'b0;
-            // 40 : addr <= 16'h01F0;
-            // 50 : data <= tmp;
-            // 60 : wr <= 1'b1;
-            // endcase
-            n <= n + 1;
-        end
-	end
-*/
 endmodule
