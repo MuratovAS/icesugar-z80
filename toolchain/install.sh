@@ -32,7 +32,7 @@ cd $TOOLCHAIN_PATH && cat $LOCAL_DIR/../toolchain.txt \
 cd $TOOLCHAIN_PATH && cat $LOCAL_DIR/../toolchain.txt \
                   | sed '/^#/d' | grep "verilog-format" \
                   && mkdir -p ./verilog-format/bin && cd ./verilog-format/bin \
-                  && $LOCAL_DIR/getGithub.sh MuratovAS/verilog-format verilog-format.jar
+                  && $LOCAL_DIR/getGithub.sh ericsonj/verilog-format verilog-format.jar
 
 cd $TOOLCHAIN_PATH && cat $LOCAL_DIR/../toolchain.txt \
                   | sed '/^#/d' | grep "toolchain-riscv32i" \

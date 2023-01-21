@@ -191,7 +191,7 @@ module iceZ0mb1e  #(
     	.addr		(addr[ROM_WIDTH-1:0])
 	);
 
-generate
+	generate
     if(RAM_TYPE == 1) begin
 		//UltraPlus SPRAM
 		memspram #(RAM_WIDTH) ram
@@ -222,7 +222,7 @@ generate
 			.addr		(addr[RAM_WIDTH-1:0])
 		);
 	end
-endgenerate
+	endgenerate
 
 	simpleirq irq 
 	(

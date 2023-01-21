@@ -97,7 +97,7 @@ module tv80s (/*AUTOARG*/
      .intcycle_n (intcycle_n)
      );  
 
-  always @(posedge clk)
+  always @(posedge clk) // TODO: or negedge reset_n
     begin
       if (!reset_n)
         begin
@@ -155,7 +155,7 @@ module tv80s (/*AUTOARG*/
               
             end // else: !if(mcycle[0])
           
-          if (tstate[2] && wait_n == 1'b1)
+          if (tstate[2] && wait_n == 1'b1 && !write && !no_read)
             data_in_reg <= #1 data_in;
         end // else: !if(!reset_n)
     end // always @ (posedge clk or negedge reset_n)

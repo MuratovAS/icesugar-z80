@@ -25,6 +25,8 @@
 // Negative-edge based wrapper allows memory wait_n signal to work
 // correctly without resorting to asynchronous logic.
 
+`include "src/tv80/tv80_core.v"
+
 module tv80n (/*AUTOARG*/
   // Outputs
   m1_n, mreq_n, iorq_n, rd_n, wr_n, rfsh_n, halt_n, busak_n, A, data_out,
