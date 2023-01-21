@@ -32,7 +32,7 @@
 `include "src/simpleio.v"
 `include "src/simpleirq.v"
 `include "src/simpledma.v"
-`include "src/tv80/tv80n.v"
+`include "src/tv80/tv80s.v"
 
 module iceZ0mb1e  #(
 	parameter RAM_TYPE = 0,
@@ -151,7 +151,7 @@ module iceZ0mb1e  #(
 	assign irq_en_n = ~(!iorq_n & !m1_n);
 	assign dma_en_n = SW[0];
 
-	tv80n cpu
+	tv80s cpu
 	(
 		.m1_n		(m1_n),
 		.mreq_n		(cpu_mreq_n),
