@@ -135,7 +135,7 @@ module iceZ0mb1e  #(
 	assign int_n = sys_int_n & irq_int_n;
 
 	//Decoder:
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, irq_en_n, dma_en_n;
+	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, irq_en_n, dma_trig_n;
 	wire rom_cs_n, ram_cs_n;
 	//I/O Address
 	assign uart_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00011)); // UART base 0x18
@@ -149,7 +149,7 @@ module iceZ0mb1e  #(
 
 	//Access:
 	assign irq_en_n = ~(!iorq_n & !m1_n);
-	assign dma_en_n = SW[0];
+	assign dma_trig_n = SW[0];
 
 	tv80s cpu
 	(
@@ -232,7 +232,7 @@ module iceZ0mb1e  #(
 	simpledma dma
 	(
 		.clk		(clk),
-		.en_n		(dma_en_n),
+		.trig_n		(dma_trig_n),
 		.reset_n	(reset_n),
     
 		//.data_cfg_out	(data_miso_dma),
