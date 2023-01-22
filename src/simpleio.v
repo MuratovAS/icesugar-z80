@@ -61,8 +61,9 @@ module simpleio (
     always @(*)
 	begin
 		case(addr)
-			2'h0 : read_data = ((cfgreg[0] == `MODE_RD) ? in_1 : out_1);
-			3'h1 : read_data = ((cfgreg[1] == `MODE_RD) ? in_2 : out_2);
+			2'b00 : read_data = ((cfgreg[0] == `MODE_RD) ? in_1 : out_1);
+			2'b01 : read_data = ((cfgreg[1] == `MODE_RD) ? in_2 : out_2);
+			2'b10 : read_data = cfgreg;
 			default : read_data = 8'h00;
 		endcase
 	end
