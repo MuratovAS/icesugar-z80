@@ -25,11 +25,11 @@
 
 #include "main.h"
 #include "mini-printf.h"
+#include "stdlib.h"
 #include "uart.h"
 #include "i2c.h"
 #include "spi.h"
 #include "dma.h"
-#include "stdlib.h"
 
 int8_t start = 0;
 uint16_t last_usable_addr = 0;
@@ -50,16 +50,16 @@ void main ()
     //i2c Test: // DHT12 // PCF8523
     i2c_config(120); //100kHz
     i2c_read_buf(0x5C, buffer, 5); // DHT12
-    View_Memory(buffer, 5);
+    viewMemory(buffer, 5);
     i2c_read_buf(0x68, buffer, 20); // PCF8523
-    View_Memory(buffer, 20);
+    viewMemory(buffer, 20);
 
     //SPI Test // 25L008A
     spi_config(0, 12); //1MHz
     uint16_t len = 64;
     uint8_t spi_send[4] = {0x3, 0x00, 0x00, 0x00};
     spi_xfer(spi_send, buffer, 4, len);
-    View_Memory(buffer, 64);
+    viewMemory(buffer, 64);
 
     //Port test
     port_cfg = 0x00; //GPIO mode = output
@@ -102,21 +102,21 @@ void main ()
                 cpu_reset();
                 break;
             case 'c': // View ROM
-                View_Memory((uint8_t*)SYS_ROM_ADDR, SYS_ROM_SIZE);
+                viewMemory((uint8_t*)SYS_ROM_ADDR, SYS_ROM_SIZE);
                 break;
             case 'd': // Test DMA
                 snprintf(strbuf, sizeof(strbuf), "Test DMA A(0x8000) -> B(0x8050)x8\n\r");
                 uart_write(strbuf);
-                View_Memory((uint8_t*)0x8000, 0x0050);
+                viewMemory((uint8_t*)0x8000, 0x0050);
                 dma_confA(MEM, (uint16_t)0x8000, 0);
                 dma_confB(MEM, (uint16_t)0x8010, 7);
                 dma_cmd(CONF_FLAG, true);
                 dma_cmd(CONF_LOOP, false);
                 dma_cmd(CONF_EN, true);
-                View_Memory((uint8_t*)0x8000, 0x0050);
+                viewMemory((uint8_t*)0x8000, 0x0050);
                 break;
             case 'm': // View RAM
-                View_Memory((uint8_t*)SYS_RAM_ADDR, SYS_RAM_SIZE);
+                viewMemory((uint8_t*)SYS_RAM_ADDR, SYS_RAM_SIZE);
                 break;
             case 't': // Test RAM
                 last_usable_addr = 0;

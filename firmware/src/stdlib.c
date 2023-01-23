@@ -43,7 +43,7 @@ void printBits(unsigned int size, unsigned int ptr)
     }
 }
 
-void View_Memory(uint8_t *mem, uint16_t len)
+void viewMemory(uint8_t *mem, uint16_t len)
 {
     uint16_t x;
 

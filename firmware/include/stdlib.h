@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void View_Memory(uint8_t *mem, uint16_t len);
+void viewMemory(uint8_t *mem, uint16_t len);
 void printBits(unsigned int size, unsigned int ptr);
 
 #endif
