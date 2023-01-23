@@ -15,6 +15,13 @@ Distinctive Features:
  - Clean test project
  - Embedded toolchain
 
+Other functions:
+ - I2C
+ - SPI
+ - UART
+ - BRAM
+ - SPRAM
+
 ## Usage
 
 The commands can be executed manually in the terminal as well as through the `Task menu` in `Code`

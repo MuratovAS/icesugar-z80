@@ -23,7 +23,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-`include "src/iceZ0mb1e.v"
+`include "src/iceMCU.v"
 
 module top(
 	input uart_rxd,
@@ -100,7 +100,7 @@ module top(
 		.D_IN_0(i2c_sda_in)
 	);
 
-	iceZ0mb1e core (
+	iceMCU core (
 		.clk		(clk),
 		.uart_txd	(uart_txd),
 		.uart_rxd	(uart_rxd),

@@ -1,5 +1,5 @@
 //
-// simpledma for TV80 SoC for Lattice iCE40
+// icesugar-z80 for TV80 SoC for Lattice iCE40
 //
 // Copyright (c) 2022 Aleksej Muratov
 //

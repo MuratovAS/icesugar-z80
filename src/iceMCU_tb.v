@@ -25,11 +25,11 @@
 
 `timescale 1us/1us
 
-module tb_iceZ0mb1e;
+module tb_iceMCU;
 
     initial begin
-        $dumpfile("iceZ0mb1e_tb.vcd");
-        $dumpvars(0, tb_iceZ0mb1e);
+        $dumpfile("iceMCU_tb.vcd");
+        $dumpvars(0, tb_iceMCU);
 
         //# 15E3 $finish;
         # 250E3 $finish;
@@ -50,7 +50,7 @@ module tb_iceZ0mb1e;
     wire rx = 0;
     wire tx;
 
-    iceZ0mb1e t1 (
+    iceMCU t1 (
         .clk        (clk),
         .uart_txd   (tx),
         .uart_rxd   (rx),

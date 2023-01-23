@@ -3,6 +3,7 @@
 // with complete open-source toolchain flow using yosys and SDCC
 //
 // Copyright (c) 2018 Franz Neumann (netinside2000@gmx.de)
+// Copyright (c) 2022 Aleksej Muratov
 //
 // Permission is hereby granted, free of charge, to any person obtaining a 
 // copy of this software and associated documentation files (the "Software"), 

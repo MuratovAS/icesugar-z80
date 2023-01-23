@@ -3,6 +3,7 @@
 // with complete open-source toolchain flow using yosys and SDCC
 //
 // Copyright (c) 2018 Franz Neumann (netinside2000@gmx.de)
+// Copyright (c) 2022 Aleksej Muratov
 //
 // Permission is hereby granted, free of charge, to any person obtaining a 
 // copy of this software and associated documentation files (the "Software"), 
@@ -23,7 +24,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 `include "src/membram.v"
 `include "src/memspram.v"
 `include "src/simplei2c_wrapper.v"
@@ -34,7 +34,7 @@
 `include "src/simpledma.v"
 `include "src/tv80/tv80s.v"
 
-module iceZ0mb1e  #(
+module iceMCU  #(
 	parameter RAM_TYPE = 0,
 	parameter RAM_WIDTH = 15,
 	parameter ROM_WIDTH = 13,
@@ -150,7 +150,7 @@ module iceZ0mb1e  #(
 
 	//Access:
 	assign irq_en_n = ~(!iorq_n & !m1_n);
-	assign dma_trig_n = SW[0];
+	assign dma_trig_n = 1'b0; // FIXME:
 
 	tv80s cpu
 	(
@@ -227,7 +227,7 @@ module iceZ0mb1e  #(
 		.en_n		(irq_en_n),
 		.int_n		(irq_int_n),
 		.data_out	(data_miso_irq),
-		.irq		()
+		.irq		(SW)
 	);
 
 	simpledma dma
