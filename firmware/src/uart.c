@@ -23,7 +23,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include "icez0mb1e.h"
+#include "main.h"
 #include "uart.h"
 
 #define UART_CMD_TRANSMIT           0x01

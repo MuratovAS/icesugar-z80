@@ -23,7 +23,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include "icez0mb1e.h"
+#include "main.h"
 #include "spi.h"
 
 #define SPI_CFG_CPHA    0x01

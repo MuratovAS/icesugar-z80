@@ -23,8 +23,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef __ICEZOMB1E_H
-#define __ICEZOMB1E_H
+#ifndef __MAIN_H
+#define __MAIN_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -32,7 +32,7 @@
 #include "mini-string.h"
 #include "cpu.h"
 
-extern char strbuf[80];
+extern char strbuf[180];
 
 #define SYS_XTAL_FREQ   12E6
 

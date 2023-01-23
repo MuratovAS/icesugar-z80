@@ -184,7 +184,7 @@ module iceZ0mb1e  #(
     	.cs_n		(rom_cs_n),
     	.rd_n		(rd_n),
     	.wr_n		(wr_n),
-    	.addr		(cpu_addr[ROM_WIDTH-1:0])//FIXME:
+    	.addr		(cpu_addr[ROM_WIDTH-1:0])//FIXME: no way to read ROM via DMA
 	);
 
 	generate

@@ -1,4 +1,4 @@
-#include "icez0mb1e.h"
+#include "main.h"
 #include "dma.h"
 
 bool dma_read(CONF_BIT addr)
@@ -9,9 +9,9 @@ bool dma_read(CONF_BIT addr)
 void dma_cmd(CONF_BIT cmd, bool state)
 {
     if (state == true)
-        dma_conf |= cmd; //установить бит
+        dma_conf |= cmd; //set the bit
     else
-        dma_conf &= ~cmd; //сбростить бит
+        dma_conf &= ~cmd; //reset the bit
 }
 
 void dma_confA(TYPE_BUS bus, uint16_t addr, uint8_t len)

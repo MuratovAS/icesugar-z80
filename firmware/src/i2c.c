@@ -23,7 +23,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#include "icez0mb1e.h"
+#include "main.h"
 #include "i2c.h"
 
 #define I2C_ADDR_WR     0x00

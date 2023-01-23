@@ -6,7 +6,14 @@ Here you will find a project for IceSugar implementing Z80.
 As well as full automation of assembly and testing.
 More detailed documentation on usage in the [FPGACode-ide](https://github.com/MuratovAS/FPGACode-ide).
 
-This project is based on the developments of [iceZ0mb1e](https://github.com/abnoname/iceZ0mb1e)
+This project is based on the developments of [iceZ0mb1e](https://github.com/abnoname/iceZ0mb1e) and [tv80](https://github.com/hutch31/tv80)
+
+Distinctive Features:
+ - DMA
+ - IRQ
+ - New version tv80
+ - Clean test project
+ - Embedded toolchain
 
 ## Usage
 
@@ -22,4 +29,24 @@ make formatter  #Perform code formatting
 make build_fw   #Build firmware
 make clean      #Cleaning the assembly of the project
 make toolchain  #Install assembly tools
+```
+
+## Using IceSugar resources
+```
+Info: Device utilisation:
+Info:            ICESTORM_LC:  3536/ 5280    66%
+Info:           ICESTORM_RAM:    16/   30    53%
+Info:                  SB_IO:    24/   96    25%
+Info:                  SB_GB:     8/    8   100%
+Info:           ICESTORM_PLL:     0/    1     0%
+Info:            SB_WARMBOOT:     0/    1     0%
+Info:           ICESTORM_DSP:     0/    8     0%
+Info:         ICESTORM_HFOSC:     1/    1   100%
+Info:         ICESTORM_LFOSC:     0/    1     0%
+Info:                 SB_I2C:     0/    2     0%
+Info:                 SB_SPI:     0/    2     0%
+Info:                 IO_I3C:     0/    2     0%
+Info:            SB_LEDDA_IP:     0/    1     0%
+Info:            SB_RGBA_DRV:     0/    1     0%
+Info:         ICESTORM_SPRAM:     1/    4    25%
 ```
