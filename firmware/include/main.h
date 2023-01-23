@@ -3,6 +3,7 @@
 // with complete open-source toolchain flow using yosys and SDCC
 //
 // Copyright (c) 2018 Franz Neumann (netinside2000@gmx.de)
+// Copyright (c) 2022 Aleksej Muratov
 //
 // Permission is hereby granted, free of charge, to any person obtaining a 
 // copy of this software and associated documentation files (the "Software"), 
@@ -49,9 +50,9 @@ __sfr __at 0x1b uart_cmd;
 __sfr __at 0x1c uart_dat_in;
 __sfr __at 0x1d uart_dat_out;
 
-__sfr __at 0x40 port_a;
-__sfr __at 0x41 port_b;
-__sfr __at 0x42 port_cfg;
+__sfr __at 0x41 port_a;
+__sfr __at 0x42 port_b;
+__sfr __at 0x43 port_cfg;
 
 __sfr __at 0x50 i2c_status;
 __sfr __at 0x52 i2c_clkdiv;

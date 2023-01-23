@@ -30,6 +30,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "dma.h"
+#include "gpio.h"
 
 int8_t start = 0;
 uint16_t last_usable_addr = 0;
@@ -62,16 +63,26 @@ void main ()
     viewMemory(buffer, 64);
 
     //Port test
-    port_cfg = 0x00; //GPIO mode = output
-    port_a = 0b00000001; //R
+    gpio_conf(PORTA,OUTPUT);
+    gpio_write(PORTA, PIN1, true);
     delay(24000);
-    port_a = 0b00000010; //G
+    gpio_write(PORTA, PIN1, false);
     delay(24000);
-    port_a = 0b00000100; //B
+    gpio_write(PORTA, PIN2, true);
+    delay(24000);
+    gpio_write(PORTA, PIN2, false);
+    delay(24000);
+    gpio_write(PORTA, PIN3, true);
+    delay(24000);
+    gpio_write(PORTA, PIN3, false);
     delay(24000);
     port_a = 0b00000000;
-    delay(24000);
 
+    gpio_conf(PORTB,INPUT);
+    snprintf(strbuf, sizeof(strbuf), "port B, pin 2 = %d\n\r", gpio_read(PORTB,PIN2));
+    uart_write(strbuf);
+
+    
     //Interrupt en
     cpu_im(0);
     cpu_ei();
@@ -105,7 +116,7 @@ void main ()
                 viewMemory((uint8_t*)SYS_ROM_ADDR, SYS_ROM_SIZE);
                 break;
             case 'd': // Test DMA
-                snprintf(strbuf, sizeof(strbuf), "Test DMA A(0x8000) -> B(0x8050)x8\n\r");
+                snprintf(strbuf, sizeof(strbuf), "Test DMA A(0x8000) -> B(0x8010)x8\n\r");
                 uart_write(strbuf);
                 viewMemory((uint8_t*)0x8000, 0x0050);
                 dma_confA(MEM, (uint16_t)0x8000, 0);
