@@ -29,6 +29,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "ssd1306.h"
+#include "dma.h"
 
 int8_t start = 0;
 uint16_t last_usable_addr = 0;
@@ -117,23 +118,6 @@ void main ()
     Read_SPI_25L008A(buffer, 64); // 25L008A
     View_Memory(buffer, 64);
 
-    //I2C OLED display test:
-    oled_reset();
-    ssd1306_initialize(0x3C);
-    ssd1306_clear();
-    ssd1306_write(0, 0, "iceZ0mb1e SoC");
-    ssd1306_write(2, 0, "by abnoname");
-    ssd1306_write(3, 0, "0123456789 Test");
-    ssd1306_write(4, 0, "Framebuffer On");
-#ifdef SSD1306_ENABLE_FRAMEBUFFER
-    ssd1306_update();
-#endif
-#ifdef SSD1306_ENABLE_GRAPHIC
-    ssd1306_line(0, 48, 127, 63, 1);
-    ssd1306_box(0, 127, 48, 63, 1);
-    ssd1306_update();
-#endif
-
     //Port test
     port_a = 0b00000001; //R
     delay(24000);
@@ -173,6 +157,17 @@ void main ()
                 break;
             case 'c':
                 View_Memory((uint8_t*)SYS_ROM_ADDR, SYS_ROM_SIZE);
+                break;
+            case 'd':
+                snprintf(strbuf, sizeof(strbuf), "Test DMA A(0x8000) -> B(0x8100)x8\n\r");
+                uart_write(strbuf);
+                View_Memory((uint8_t*)SYS_RAM_ADDR, 0x0200);
+                dma_confA(MEM, (uint16_t)0x8000, 0);
+                dma_confB(MEM, (uint16_t)0x8100, 7);
+                dma_cmd(CONF_FLAG, true);
+                dma_cmd(CONF_LOOP, false);
+                dma_cmd(CONF_EN, true);
+                View_Memory((uint8_t*)SYS_RAM_ADDR, 0x0200);
                 break;
             case 'm':
                 View_Memory((uint8_t*)SYS_RAM_ADDR, SYS_RAM_SIZE);

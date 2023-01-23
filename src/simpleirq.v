@@ -25,7 +25,7 @@
 module simpleirq (
     input clk,
     input m1_n,
-    input cs_n,
+    input en_n,
     output int_n,
     output[7:0] data_out,
     input[7:0] irq
@@ -33,7 +33,7 @@ module simpleirq (
     reg[7:0] vector;
 
     assign int_n = !(irq[0] | irq[1] | irq[2] | irq[3] | irq[5] | irq[6] | irq[7]);
-    assign data_out = (!cs_n) ? vector : 8'h0;
+    assign data_out = (!en_n) ? vector : 8'h0;
 
     always @(irq)
 	begin

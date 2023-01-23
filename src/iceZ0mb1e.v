@@ -31,6 +31,7 @@
 `include "src/simpleuart_wrapper.v"
 `include "src/simpleio.v"
 `include "src/simpleirq.v"
+`include "src/simpledma.v"
 `include "src/tv80/tv80s.v"
 
 module iceZ0mb1e  #(
@@ -57,7 +58,7 @@ module iceZ0mb1e  #(
     input[7:0] P2_in,
     output P2_oen,
 	input[3:0] SW,
-	output debug
+	output[7:0] debug
 );
 	localparam ROM_SIZE = (1 << ROM_WIDTH);
 	localparam RAM_SIZE = (1 << RAM_WIDTH);
@@ -66,9 +67,10 @@ module iceZ0mb1e  #(
 	reg         reset_n = 1'b0;
 	reg         wait_n = 1'b0;
 	reg         nmi_n = 1'b0;
-	reg         busrq_n = 1'b0;
+	reg         sys_busrq_n = 1'b0;
 	reg         sys_int_n = 1'b0;
 
+	wire        busrq_n;
 	wire        int_n;
 	wire        m1_n;
 	wire        mreq_n;
@@ -82,6 +84,8 @@ module iceZ0mb1e  #(
 	wire [7:0]  data_miso;
 	wire [7:0]  data_mosi;
 
+	wire [7:0] cpu_data_mosi;
+	wire [7:0] dma_data_mosi;
 	wire [7:0] data_miso_rom;
 	wire [7:0] data_miso_ram;
 	wire [7:0] data_miso_port;
@@ -89,12 +93,20 @@ module iceZ0mb1e  #(
 	wire [7:0] data_miso_i2c;
 	wire [7:0] data_miso_spi;
 	wire [7:0] data_miso_irq;
-	wire       irq_int_n;
-
-	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
-			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq;
-
-	assign int_n = irq_int_n & sys_int_n;
+	wire [7:0] data_miso_dma;
+	
+	wire [15:0] cpu_addr;
+	wire        cpu_mreq_n;
+	wire        cpu_iorq_n;
+	wire        cpu_rd_n;
+	wire        cpu_wr_n;
+	wire [15:0] dma_addr;
+	wire        dma_busrq_n;
+	wire        dma_mreq_n;
+	wire        dma_iorq_n;
+	wire        dma_rd_n;
+	wire        dma_wr_n;
+	wire        irq_int_n;
 
 	//Reset Controller:
 	always @(posedge clk) begin
@@ -102,45 +114,56 @@ module iceZ0mb1e  #(
 			begin
 				wait_n		<= 1'b1;
 				nmi_n		<= 1'b1;
-				busrq_n		<= 1'b1;
 				reset_n		<= 1'b1;
+				sys_busrq_n	<= 1'b1;
 				sys_int_n	<= 1'b1;
 			end
 	end
 
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, irq_cs_n;
-	wire rom_cs_n, ram_cs_n;
+	//bus
+	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
+			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq | data_miso_dma;
 
-	//I/O Address Decoder:
+	assign data_mosi = busak_n ? cpu_data_mosi : dma_data_mosi;
+	assign addr = busak_n ? cpu_addr : dma_addr;
+
+	assign busrq_n = sys_busrq_n & dma_busrq_n;
+	assign mreq_n = cpu_mreq_n & dma_mreq_n;
+	assign iorq_n = cpu_iorq_n & dma_iorq_n;
+	assign rd_n = cpu_rd_n & dma_rd_n;
+	assign wr_n = cpu_wr_n & dma_wr_n;
+	assign int_n = sys_int_n & irq_int_n;
+
+	//Decoder:
+	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n;
+	wire irq_en_n, dma_trig_n;
+	wire rom_cs_n, ram_cs_n;
+	//I/O Address
 	assign uart_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00011)); // UART base 0x18
 	assign port_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01000)); // PORT base 0x40
 	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
 	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
-	assign irq_cs_n = ~(!iorq_n & !m1_n);
-	//Memory Address Decoder:
+	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // dma base 0x70
+	//Memory Address
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
 
-	//SoC Info
-	initial begin
-		$display("iceZ0mb1e Configuration Info" );
-		$display("ROM width = %d, size = %X", ROM_WIDTH, ROM_SIZE );
-		$display("RAM width = %d, size = %X", RAM_WIDTH, RAM_SIZE );
-		$display("RAM type = %d", RAM_TYPE );
-	end
+	//Access:
+	assign irq_en_n = ~(!iorq_n & !m1_n);
+	assign dma_trig_n = SW[0];
 
 	tv80s cpu
 	(
 		.m1_n		(m1_n),
-		.mreq_n		(mreq_n),
-		.iorq_n		(iorq_n),
-		.rd_n		(rd_n),
-		.wr_n		(wr_n),
+		.mreq_n		(cpu_mreq_n),
+		.iorq_n		(cpu_iorq_n),
+		.rd_n		(cpu_rd_n),
+		.wr_n		(cpu_wr_n),
 		.rfsh_n		(rfsh_n),
 		.halt_n		(halt_n),
 		.busak_n	(busak_n),
-		.A		(addr[15:0]),
-		.data_out	(data_mosi),
+		.A			(cpu_addr),
+		.data_out	(cpu_data_mosi),
 		.reset_n	(reset_n),
 		.clk		(clk),
 		.wait_n		(wait_n),
@@ -150,7 +173,6 @@ module iceZ0mb1e  #(
 		.data_in	(data_miso)
 	);
 	defparam cpu.Mode = 0; // 0 => Z80, 1 => Fast Z80, 2 => 8080, 3 => GB
-	defparam cpu.T2Write = 1; // 0 => wr_n active in T3, /=0 => wr_n active in T2
 	defparam cpu.IOWait = 1; // 0 => Single cycle I/O, 1 => Std I/O cycle
 
 	membram #(ROM_WIDTH, `__def_fw_img, 1) rom
@@ -162,7 +184,7 @@ module iceZ0mb1e  #(
     	.cs_n		(rom_cs_n),
     	.rd_n		(rd_n),
     	.wr_n		(wr_n),
-    	.addr		(addr[ROM_WIDTH-1:0])
+    	.addr		(cpu_addr[ROM_WIDTH-1:0])//FIXME:
 	);
 
 	generate
@@ -202,10 +224,34 @@ module iceZ0mb1e  #(
 	(
 		.clk		(clk),
 		.m1_n		(m1_n),
-		.cs_n		(irq_cs_n),
+		.en_n		(irq_en_n),
 		.int_n		(irq_int_n),
 		.data_out	(data_miso_irq),
-		.irq		(SW)
+		.irq		()
+	);
+
+	simpledma dma
+	(
+		.clk		(clk),
+		.reset_n	(reset_n),
+		.data_cfg_out	(data_miso_dma),
+		.data_cfg_in	(data_mosi),
+		.cs_cfg_n		(dma_cs_n),
+		.rd_cfg_n		(rd_n),
+		.wr_cfg_n		(wr_n),
+		.addr_cfg		(addr[2:0]),
+
+		.busak_n	(busak_n),
+		.busrq_n	(dma_busrq_n),
+		
+		.trig_n		(dma_trig_n),
+		.data_out	(dma_data_mosi),
+		.data_in	(data_miso),
+		.addr_out	(dma_addr),
+		.rd_n		(dma_rd_n),
+		.wr_n		(dma_wr_n),
+		.iorq_n		(dma_iorq_n),
+    	.mreq_n		(dma_mreq_n)
 	);
 
 	simpleio ioporta
@@ -269,5 +315,13 @@ module iceZ0mb1e  #(
 		.miso		(spi_miso),
 		.cs			(spi_cs)
 	);
+
+	//SoC Info
+	initial begin
+		$display("iceZ0mb1e Configuration Info" );
+		$display("ROM width = %d, size = %X", ROM_WIDTH, ROM_SIZE );
+		$display("RAM width = %d, size = %X", RAM_WIDTH, RAM_SIZE );
+		$display("RAM type = %d", RAM_TYPE );
+	end
 
 endmodule

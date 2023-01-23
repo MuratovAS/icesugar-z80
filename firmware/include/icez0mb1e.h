@@ -27,6 +27,7 @@
 #define __ICEZOMB1E_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "mini-printf.h"
 #include "mini-string.h"
 #include "cpu.h"
@@ -64,5 +65,13 @@ __sfr __at 0x62 spi_clkdiv;
 __sfr __at 0x63 spi_cmd;
 __sfr __at 0x64 spi_dat_in;
 __sfr __at 0x65 spi_dat_out;
+
+__sfr __at 0x70 dma_conf;
+__sfr __at 0x71 dma_lenA;
+__sfr __at 0x72 dma_lenB;
+__sfr __at 0x73 dma_addAL;
+__sfr __at 0x74 dma_addAH;
+__sfr __at 0x75 dma_addBL;
+__sfr __at 0x76 dma_addBH;
 
 #endif
