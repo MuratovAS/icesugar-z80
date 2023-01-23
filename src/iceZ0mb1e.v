@@ -122,7 +122,7 @@ module iceZ0mb1e  #(
 
 	//bus
 	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
-			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq; // | data_miso_dma;
+			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq | data_miso_dma;
 
 	assign data_mosi = busak_n ? cpu_data_mosi : dma_data_mosi;
 	assign addr = busak_n ? cpu_addr : dma_addr;
@@ -135,14 +135,15 @@ module iceZ0mb1e  #(
 	assign int_n = sys_int_n & irq_int_n;
 
 	//Decoder:
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, irq_en_n, dma_trig_n;
+	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n;
+	wire irq_en_n, dma_trig_n;
 	wire rom_cs_n, ram_cs_n;
 	//I/O Address
 	assign uart_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00011)); // UART base 0x18
 	assign port_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01000)); // PORT base 0x40
 	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
 	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
-	//assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // dma base TODO:
+	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // dma base 0x70
 	//Memory Address
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
@@ -232,26 +233,25 @@ module iceZ0mb1e  #(
 	simpledma dma
 	(
 		.clk		(clk),
-		.trig_n		(dma_trig_n),
 		.reset_n	(reset_n),
-    
-		//.data_cfg_out	(data_miso_dma),
-		//.data_cfg_in	(data_mosi),
-		//.cs_n
-		
+		.data_cfg_out	(data_miso_dma),
+		.data_cfg_in	(data_mosi),
+		.cs_cfg_n		(dma_cs_n),
+		.rd_cfg_n		(rd_n),
+		.wr_cfg_n		(wr_n),
+		.addr_cfg		(addr[2:0]),
+
 		.busak_n	(busak_n),
 		.busrq_n	(dma_busrq_n),
 		
+		.trig_n		(dma_trig_n),
 		.data_out	(dma_data_mosi),
 		.data_in	(data_miso),
 		.addr_out	(dma_addr),
-
 		.rd_n		(dma_rd_n),
 		.wr_n		(dma_wr_n),
 		.iorq_n		(dma_iorq_n),
-    	.mreq_n		(dma_mreq_n),
-
-		.debug		(debug)
+    	.mreq_n		(dma_mreq_n)
 	);
 
 	simpleio ioporta
