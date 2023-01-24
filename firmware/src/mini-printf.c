@@ -42,6 +42,7 @@
  */
 
 #include "mini-printf.h"
+#include "wdt.h"
 
 static unsigned int
 mini_strlen(const char *s)
@@ -70,6 +71,9 @@ mini_itoa(int value, unsigned int radix, unsigned int uppercase, unsigned int un
 
 	/* This builds the string back to front ... */
 	do {
+		#if defined(WDT)
+            WDTRST;
+        #endif
 		int digit = value % radix;
 		*(pbuffer++) = (digit < 10 ? '0' + digit : (uppercase ? 'A' : 'a') + digit - 10);
 		value /= radix;
@@ -138,6 +142,9 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 	b.buffer_len = buffer_len;
 
 	while ((ch=*(fmt++))) {
+		#if defined(WDT)
+            WDTRST;
+        #endif
 		if ((unsigned int)((b.pbuffer - b.buffer) + 1) >= b.buffer_len)
 			break;
 		if (ch!='%')

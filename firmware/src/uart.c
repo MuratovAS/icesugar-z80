@@ -25,6 +25,7 @@
 
 #include "main.h"
 #include "uart.h"
+#include "wdt.h"
 
 #define UART_CMD_TRANSMIT           0x01
 
@@ -43,7 +44,12 @@ void putchar(char c)
 int putchar(int c)
 {
     uart_cmd = 0;
-    while ((uart_status & UART_STATUS_READY) == 0);
+    while ((uart_status & UART_STATUS_READY) == 0)
+    {
+        #if defined(WDT)
+            WDTRST;
+        #endif
+    }
     uart_dat_out = c;
     uart_cmd |= UART_CMD_TRANSMIT;
     return c;
@@ -56,7 +62,12 @@ char getchar()
 int getchar()
 #endif
 {
-    while ((uart_status & UART_STATUS_RECEIVED) == 0);
+    while ((uart_status & UART_STATUS_RECEIVED) == 0)
+    {
+        #if defined(WDT)
+            WDTRST;
+        #endif
+    }
     return uart_dat_in;
 }
 

@@ -12,6 +12,7 @@ Distinctive Features:
  - DMA
  - IRQ
  - GPIO
+ - WDT
  - New version tv80
  - Clean test project
  - Embedded toolchain

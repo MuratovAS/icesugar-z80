@@ -30,6 +30,7 @@
 #include "i2c.h"
 #include "spi.h"
 #include "dma.h"
+#include "wdt.h"
 #include "gpio.h"
 
 int8_t start = 0;
@@ -82,6 +83,11 @@ void main ()
     snprintf(strbuf, sizeof(strbuf), "port B, pin 2 = %d\n\r", gpio_read(PORTB,PIN2));
     uart_write(strbuf);
 
+    #if defined(WDT)
+        WDTDIV(240);
+        WDTCOMP(200);
+        WDTRST;
+    #endif
     
     //Interrupt en
     cpu_im(0);

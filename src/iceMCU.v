@@ -32,6 +32,7 @@
 `include "src/simpleio.v"
 `include "src/simpleirq.v"
 `include "src/simpledma.v"
+`include "src/simplewdt.v"
 `include "src/tv80/tv80s.v"
 `include "src/clk_divider.v"
 
@@ -96,6 +97,7 @@ module iceMCU  #(
 	wire [7:0] data_miso_spi;
 	wire [7:0] data_miso_irq;
 	wire [7:0] data_miso_dma;
+	wire [7:0] data_miso_wdt;
 	
 	wire [15:0] cpu_addr;
 	wire        cpu_mreq_n;
@@ -108,6 +110,7 @@ module iceMCU  #(
 	wire        dma_iorq_n;
 	wire        dma_rd_n;
 	wire        dma_wr_n;
+	wire        wdt_reset;
 	wire        irq_int_n;
 
 	//Reset Controller:
@@ -116,19 +119,20 @@ module iceMCU  #(
 			begin
 				wait_n		<= 1'b1;
 				nmi_n		<= 1'b1;
-				reset_n		<= 1'b1;
+				sys_reset_n		<= 1'b1;
 				sys_busrq_n	<= 1'b1;
 				sys_int_n	<= 1'b1;
 			end
 	end
 
 	//bus
-	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_port |
-			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq | data_miso_dma;
+	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_io |
+			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq | data_miso_dma | data_miso_wdt;
 
 	assign data_mosi = busak_n ? cpu_data_mosi : dma_data_mosi;
 	assign addr = busak_n ? cpu_addr : dma_addr;
 
+	assign reset_n = sys_reset_n & !wdt_reset; //FIXME:
 	assign busrq_n = sys_busrq_n & dma_busrq_n;
 	assign mreq_n = cpu_mreq_n & dma_mreq_n;
 	assign iorq_n = cpu_iorq_n & dma_iorq_n;
@@ -137,7 +141,7 @@ module iceMCU  #(
 	assign int_n = sys_int_n & irq_int_n;
 
 	//Decoder:
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n;
+	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n, wdt_cs_n;
 	wire irq_en_n, dma_trig_n;
 	wire rom_cs_n, ram_cs_n;
 	//I/O Address
@@ -146,6 +150,7 @@ module iceMCU  #(
 	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
 	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
 	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // dma base 0x70
+	assign wdt_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00001)); // PORT base 0x8
 	//Memory Address
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
@@ -221,6 +226,20 @@ module iceMCU  #(
 		);
 	end
 	endgenerate
+
+	simplewdt wdt 
+	(
+		.clk		(clk),
+		.reset_n	(reset_n),
+		.busrq_n	(busrq_n),
+		.data_out	(data_miso_wdt),
+		.data_in	(data_mosi),
+		.cs_n		(wdt_cs_n),
+		.rd_n		(rd_n),
+		.wr_n		(wr_n),
+		.addr		(addr[1:0]),
+		.reset		(wdt_reset)
+	);
 
 	simpleirq irq 
 	(
