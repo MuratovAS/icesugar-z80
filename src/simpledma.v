@@ -100,7 +100,7 @@ module simpledma (
     //// backend
     assign busrq_n  = ~((!trig_n && `CONF_EN) || mutex);
 
-    assign permission = !busrq_n && !busak_n;
+    assign permission = !busrq_n && !busak_n && reset_n;
 
     assign iorq_n   = permission ? ~iorq : `TRUE;
     assign mreq_n   = permission ? ~mreq : `TRUE;
@@ -117,116 +117,128 @@ module simpledma (
 
     always @(posedge clk)
 	begin
-        if (!write_cfg_sel) 
+        if (reset_n)
         begin
-            if (`CONF_RST)
-            begin 
-                `CONF_EN <= `FALSE;
-                `CONF_RST <= `FALSE;
-                if (!`CONF_EN)
-                    flag_n = `TRUE;
-                i <= 8'd0;
-                incrementA <= 8'd0;
-                incrementB <= 8'd0;
-            end
-
-            if(permission)
+            if (!write_cfg_sel) 
             begin
-                if(`CONF_EN)
+                if (`CONF_RST)
+                begin 
+                    `CONF_EN <= `FALSE;
+                    `CONF_RST <= `FALSE;
+                    if (!`CONF_EN)
+                        flag_n = `TRUE;
+                    i <= 8'd0;
+                    incrementA <= 8'd0;
+                    incrementB <= 8'd0;
+                end
+
+                if(permission)
                 begin
-                    if (`CONF_FLAG)
-                        flag_n <= `TRUE;
-
-                    case(i)
-                    8'd0 : mutex <= `TRUE;
-                    /////// Read A
-                    8'd1 : begin 
-                            if (`CONF_IOA == `TRUE)
-                                iorq <= `TRUE;
-                            else
-                                mreq <= `TRUE;
-                            end
-                    8'd2 : addr <= addA + incrementA;
-                    8'd3 : rd <= `TRUE;
-                    //8'd4 :
-                    8'd5 : buff <= data_in;
-                    6: rd <= `FALSE;
-                    8'd7 : begin 
-                            if (`CONF_IOA == `TRUE)
-                                iorq <= `FALSE;
-                            else
-                                mreq <= `FALSE;
-                            end
-                    /////// Write B
-                    8'd10 : begin 
-                            if (`CONF_IOB == `TRUE)
-                                iorq <= `TRUE;
-                            else
-                                mreq <= `TRUE;
-                            end
-                    8'd11 : addr <= addB + incrementB;
-                    8'd12 : data <= buff;
-                    8'd13 : wr <= `TRUE;
-                    8'd14 : wr <= `FALSE;
-                    8'd15 : begin 
-                            if (`CONF_IOB == `TRUE)
-                                iorq <= `FALSE;
-                            else
-                                mreq <= `FALSE;
-                            end
-                    8'd16 :  mutex <= `FALSE;
-                    endcase
-                    /////// iterator
-                    if (i < 8'd16)
-                        i <= i + 8'd1;
-                    else
+                    if(`CONF_EN)
                     begin
-                        i <= 8'd0;
+                        if (`CONF_FLAG)
+                            flag_n <= `TRUE;
 
-                        // increments
-                        if (incrementA < lenA)
-                            incrementA <= incrementA + 8'd1;
+                        case(i)
+                        8'd0 : mutex <= `TRUE;
+                        /////// Read A
+                        8'd1 : begin 
+                                if (`CONF_IOA == `TRUE)
+                                    iorq <= `TRUE;
+                                else
+                                    mreq <= `TRUE;
+                                end
+                        8'd2 : addr <= addA + incrementA;
+                        8'd3 : rd <= `TRUE;
+                        //8'd4 :
+                        8'd5 : buff <= data_in;
+                        6: rd <= `FALSE;
+                        8'd7 : begin 
+                                if (`CONF_IOA == `TRUE)
+                                    iorq <= `FALSE;
+                                else
+                                    mreq <= `FALSE;
+                                end
+                        /////// Write B
+                        8'd10 : begin 
+                                if (`CONF_IOB == `TRUE)
+                                    iorq <= `TRUE;
+                                else
+                                    mreq <= `TRUE;
+                                end
+                        8'd11 : addr <= addB + incrementB;
+                        8'd12 : data <= buff;
+                        8'd13 : wr <= `TRUE;
+                        8'd14 : wr <= `FALSE;
+                        8'd15 : begin 
+                                if (`CONF_IOB == `TRUE)
+                                    iorq <= `FALSE;
+                                else
+                                    mreq <= `FALSE;
+                                end
+                        8'd16 :  mutex <= `FALSE;
+                        endcase
+                        /////// iterator
+                        if (i < 8'd16)
+                            i <= i + 8'd1;
                         else
-                            incrementA <= 8'd0;
-
-                        if (incrementB < lenB)
-                            incrementB <= incrementB + 8'd1;
-                        else
-                            incrementB <= 8'd0;
-
-                        // single/loop
-                        if (lenA == lenB)
                         begin
-                            if (incrementA == lenA)
-                                exit_i();
-                        end
-                        else
-                            if (lenA > lenB)
+                            i <= 8'd0;
+
+                            // increments
+                            if (incrementA < lenA)
+                                incrementA <= incrementA + 8'd1;
+                            else
+                                incrementA <= 8'd0;
+
+                            if (incrementB < lenB)
+                                incrementB <= incrementB + 8'd1;
+                            else
+                                incrementB <= 8'd0;
+
+                            // single/loop
+                            if (lenA == lenB)
                             begin
-                                if (!(incrementA < lenA)) //loop check
+                                if (incrementA == lenA)
                                     exit_i();
                             end
                             else
-                            begin
-                                if (!(incrementB < lenB))//loop check
-                                    exit_i();
-                            end
+                                if (lenA > lenB)
+                                begin
+                                    if (!(incrementA < lenA)) //loop check
+                                        exit_i();
+                                end
+                                else
+                                begin
+                                    if (!(incrementB < lenB))//loop check
+                                        exit_i();
+                                end
+                        end
                     end
                 end
             end
+            else
+            begin
+                if(!read_cfg_sel)
+                    case(addr_cfg)
+                        3'b000 : conf <= data_cfg_in;
+                        3'b001 : lenA <= data_cfg_in;
+                        3'b010 : lenB <= data_cfg_in;
+                        3'b011 : addA[7:0] <= data_cfg_in;
+                        3'b100 : addA[15:8] <= data_cfg_in;
+                        3'b101 : addB[7:0] <= data_cfg_in;
+                        3'b110 : addB[15:8] <= data_cfg_in;
+                    endcase
+            end
         end
         else
-        begin
-            if(!read_cfg_sel)
-                case(addr_cfg)
-                    3'b000 : conf <= data_cfg_in;
-                    3'b001 : lenA <= data_cfg_in;
-                    3'b010 : lenB <= data_cfg_in;
-                    3'b011 : addA[7:0] <= data_cfg_in;
-                    3'b100 : addA[15:8] <= data_cfg_in;
-                    3'b101 : addB[7:0] <= data_cfg_in;
-                    3'b110 : addB[15:8] <= data_cfg_in;
-                endcase
+        begin   // hard reset
+            `CONF_EN <= 8'b0;
+            i <= 8'd0;
+            incrementA <= 8'd0;
+            incrementB <= 8'd0;
+            flag_n <= `TRUE;
+            mutex <= `FALSE;
         end
 	end
 

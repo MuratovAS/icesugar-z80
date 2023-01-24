@@ -64,24 +64,31 @@ module simpleio (
     always @(*)
 	begin
 		case(addr)
-			2'b01 : read_data = ((cfgreg[0] == `MODE_RD) ? in_1 : out_1);
-			2'b10 : read_data = ((cfgreg[1] == `MODE_RD) ? in_2 : out_2);
-			2'b11 : read_data = cfgreg;
-			default : read_data = 8'h00;
+			2'b01 : read_data <= ((cfgreg[0] == `MODE_RD) ? in_1 : out_1);
+			2'b10 : read_data <= ((cfgreg[1] == `MODE_RD) ? in_2 : out_2);
+			2'b11 : read_data <= cfgreg;
+			default : read_data <= 8'h00;
 		endcase
 	end
 
     always @(posedge clk)
     begin
-        if ( write_sel ) begin
-            case(addr)
-                2'b01 : out_1 <= data_in;
-                2'b10 : out_2 <= data_in;
-                2'b11 : cfgreg <= data_in;
-            endcase
+        if ( !reset_n )
+        begin
+            cfgreg  <= 8'b0;
         end
+        else
+            if ( write_sel ) begin
+                case(addr)
+                    2'b01 : out_1 <= data_in;
+                    2'b10 : out_2 <= data_in;
+                    2'b11 : cfgreg <= data_in;
+                endcase
+            end
         in_1 <= P1_in;
         in_2 <= P2_in;
+
     end
+
 
 endmodule
