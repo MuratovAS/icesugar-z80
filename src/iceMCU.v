@@ -33,6 +33,7 @@
 `include "src/simpleirq.v"
 `include "src/simpledma.v"
 `include "src/tv80/tv80s.v"
+`include "src/clk_divider.v"
 
 module iceMCU  #(
 	parameter RAM_TYPE = 0,
@@ -51,12 +52,12 @@ module iceMCU  #(
 	output spi_mosi,
 	input  spi_miso,
     output spi_cs,
-    output[7:0] P1_out,
-    input[7:0] P1_in,
-    output P1_oen,
-    output[7:0] P2_out,
-    input[7:0] P2_in,
-    output P2_oen,
+    output[7:0] PA_out,
+    input[7:0] PA_in,
+    output PA_oen,
+    output[7:0] PB_out,
+    input[7:0] PB_in,
+    output PB_oen,
 	input[3:0] SW,
 	output[7:0] debug
 );
@@ -64,12 +65,13 @@ module iceMCU  #(
 	localparam RAM_SIZE = (1 << RAM_WIDTH);
 
 	//Z80 Bus:
-	reg         reset_n = 1'b0;
 	reg         wait_n = 1'b0;
 	reg         nmi_n = 1'b0;
+	reg         sys_reset_n = 1'b0;
 	reg         sys_busrq_n = 1'b0;
 	reg         sys_int_n = 1'b0;
 
+	wire        reset_n;
 	wire        busrq_n;
 	wire        int_n;
 	wire        m1_n;
@@ -88,7 +90,7 @@ module iceMCU  #(
 	wire [7:0] dma_data_mosi;
 	wire [7:0] data_miso_rom;
 	wire [7:0] data_miso_ram;
-	wire [7:0] data_miso_port;
+	wire [7:0] data_miso_io;
 	wire [7:0] data_miso_uart;
 	wire [7:0] data_miso_i2c;
 	wire [7:0] data_miso_spi;
@@ -254,22 +256,22 @@ module iceMCU  #(
     	.mreq_n		(dma_mreq_n)
 	);
 
-	simpleio ioporta
+	simpleio ioport
 	(
 		.clk		(clk),
 		.reset_n	(reset_n),
-		.data_out	(data_miso_port),
+		.data_out	(data_miso_io),
 		.data_in	(data_mosi),
 		.cs_n		(port_cs_n),
 		.rd_n		(rd_n),
 		.wr_n		(wr_n),
 		.addr		(addr[1:0]),
-		.P1_out		(P1_out),
-		.P1_in		(P1_in),
-		.P1_oen		(P1_oen),
-		.P2_out		(P2_out),
-		.P2_in		(P2_in),
-		.P2_oen		(P2_oen)
+		.PA_out		(PA_out),
+		.PA_in		(PA_in),
+		.PA_oen		(PA_oen),
+		.PB_out		(PB_out),
+		.PB_in		(PB_in),
+		.PB_oen		(PB_oen)
 	);
 
 	simpleuart_wrapper uart0

@@ -24,7 +24,6 @@
 //
 
 `include "src/simplei2c.v"
-`include "src/clk_enable.v"
 
 module simplei2c_wrapper (
     input clk,
@@ -83,7 +82,7 @@ module simplei2c_wrapper (
 		end
     end
 
-	clk_enable i2c_clk_divider (
+	clk_divider i2c_clk_divider (
 		.reset(!reset_n),
 		.divider( { 8'h 00, reg_clockdiv } ), //f=12E6/120=100kHz => div=120/2
 		.clk_in(clk),

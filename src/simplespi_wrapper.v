@@ -96,7 +96,7 @@ module simplespi_wrapper (
 
 	wire spi_clk_en;
 
-	clk_enable spi_clk_divider (
+	clk_divider spi_clk_divider (
 		.reset(!reset_n),
 		.divider({ 8'h 00, reg_clockdiv}), //f=12E6/12=1MHz => div=12/2
 		.clk_in(clk),

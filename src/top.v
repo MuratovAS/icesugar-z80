@@ -112,12 +112,12 @@ module top(
 		.i2c_sda_in	(i2c_sda_in),
 		.i2c_sda_out	(i2c_sda_out),
 		.i2c_sda_oen	(i2c_sda_oen),
-		.P1_out		(P1_out),
-		.P1_in		(8'h55),
-		.P1_oen		(),
-		.P2_out		(P2_out),
-		.P2_in		(8'hAA),
-		.P2_oen		(),
+		.PA_out		(P1_out),
+		.PA_in		(8'h55),
+		.PA_oen		(),
+		.PB_out		(P2_out),
+		.PB_in		(8'hAA),
+		.PB_oen		(),
 		.SW			(SW),
 		.debug		(DEBUG)
 	);

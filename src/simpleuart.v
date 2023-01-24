@@ -68,14 +68,14 @@ module simpleuart(
 
     reg req_start_transmit = 1'b 0;
 
-	clk_enable baud_clock (
+	clk_divider baud_clock (
 		.reset( (fsm_state == STATE_IDLE) ),
 		.divider(baud_divider),
 		.clk_in(clk),
 		.clk_en(clken_baud)
 	);
 
-	clk_enable sample_clock (
+	clk_divider sample_clock (
 		.reset(clken_baud),
 		.divider( {1'b 0, baud_divider[15:1] } ),
 		.clk_in(clk),

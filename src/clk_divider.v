@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-module clk_enable(
+module clk_divider(
     input wire clk_in,
     input wire reset,
 	input wire[15:0] divider,
