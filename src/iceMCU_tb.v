@@ -39,8 +39,8 @@ module tb_iceMCU;
     reg clk = 0;
     always #1 clk = !clk;
 
-    inout [7:0] P1_out;
-    inout [7:0] P2_out;
+    inout [7:0] PA_out;
+    inout [7:0] PB_out;
 	wire i2c_scl;
 	wire i2c_sda_out;
 	wire i2c_sda_in;
@@ -62,12 +62,12 @@ module tb_iceMCU;
 		.spi_mosi	(spi_mosi),
 		.spi_miso	(spi_miso),
     	.spi_cs		(spi_cs),
-		.P1_out		(P1_out),
-		.P1_in		(8'h55),
-		.P1_oen		(),
-		.P2_out		(P2_out),
-		.P2_in		(8'hAA),
-		.P2_oen		(),
+		.PA_out		(PA_out),
+		.PA_in		(8'h55),
+		.PA_oen		(),
+		.PB_out		(PB_out),
+		.PB_in		(8'hAA),
+		.PB_oen		(),
 		.debug		()
     );
 
