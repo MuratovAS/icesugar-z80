@@ -125,8 +125,10 @@ module simpledma (
                 begin 
                     `CONF_EN <= `FALSE;
                     `CONF_RST <= `FALSE;
+                    
                     if (!`CONF_EN)
                         flag_n = `TRUE;
+
                     i <= 8'd0;
                     incrementA <= 8'd0;
                     incrementB <= 8'd0;
@@ -200,19 +202,27 @@ module simpledma (
                             if (lenA == lenB)
                             begin
                                 if (incrementA == lenA)
+                                begin
                                     exit_i();
+                                end
                             end
                             else
+                            begin
                                 if (lenA > lenB)
                                 begin
                                     if (!(incrementA < lenA)) //loop check
+                                    begin
                                         exit_i();
+                                    end
                                 end
                                 else
                                 begin
                                     if (!(incrementB < lenB))//loop check
+                                    begin
                                         exit_i();
+                                    end
                                 end
+                            end
                         end
                     end
                 end
@@ -220,6 +230,7 @@ module simpledma (
             else
             begin
                 if(!read_cfg_sel)
+                begin
                     case(addr_cfg)
                         3'b000 : conf <= data_cfg_in;
                         3'b001 : lenA <= data_cfg_in;
@@ -229,6 +240,7 @@ module simpledma (
                         3'b101 : addB[7:0] <= data_cfg_in;
                         3'b110 : addB[15:8] <= data_cfg_in;
                     endcase
+                end
             end
         end
         else
@@ -260,6 +272,7 @@ module simpledma (
     begin
         if (`CONF_FLAG)
             flag_n <= `FALSE;
+            
         if (`CONF_LOOP == `FALSE)
         begin
             `CONF_RST <= `TRUE;

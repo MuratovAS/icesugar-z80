@@ -78,6 +78,7 @@ module simplewdt (
             end
             else
                 if (pause_n && comparator != 1'b0)
+                begin
                     if (counter_divider < divider)
                         counter_divider <= counter_divider + 1'b1;
                     else
@@ -91,6 +92,7 @@ module simplewdt (
                             comparator <= 8'h0;
                         end
                     end
+                end
         end
     end
 endmodule

@@ -132,7 +132,7 @@ module iceMCU  #(
 	assign data_mosi = busak_n ? cpu_data_mosi : dma_data_mosi;
 	assign addr = busak_n ? cpu_addr : dma_addr;
 
-	assign reset_n = sys_reset_n & !wdt_reset; //FIXME:
+	assign reset_n = sys_reset_n & !wdt_reset;
 	assign busrq_n = sys_busrq_n & dma_busrq_n;
 	assign mreq_n = cpu_mreq_n & dma_mreq_n;
 	assign iorq_n = cpu_iorq_n & dma_iorq_n;
@@ -150,7 +150,7 @@ module iceMCU  #(
 	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
 	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
 	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // dma base 0x70
-	assign wdt_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00001)); // PORT base 0x8
+	assign wdt_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00001)); // WDT base 0x8
 	//Memory Address
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
