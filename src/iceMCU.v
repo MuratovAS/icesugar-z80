@@ -231,7 +231,7 @@ module iceMCU  #(
 	(
 		.clk		(clk),
 		.reset_n	(reset_n),
-		.busrq_n	(busrq_n),
+		.pause_n	(busrq_n),
 		.data_out	(data_miso_wdt),
 		.data_in	(data_mosi),
 		.cs_n		(wdt_cs_n),

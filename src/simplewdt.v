@@ -22,12 +22,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// the module is not completed.
-
 module simplewdt (
     input clk,
     input reset_n,
-    input busrq_n,
+    input pause_n,
     output[7:0] data_out,
     input[7:0] data_in,
     input cs_n,
@@ -48,6 +46,7 @@ module simplewdt (
     
     //reg[7:0] read_data;
 	//assign data_out = (read_sel) ? read_data : 8'b0;
+	assign data_out = 8'h00;
 
     /*always @(*)
 	begin
@@ -70,32 +69,28 @@ module simplewdt (
         end
         else
         begin
-            if(busrq_n)
+            if (!reset_n)
             begin
-                if (!reset_n)
-                begin
-                    counter_divider  <= 8'b0;
-                    counter  <= 8'b0;
-                    reset <= 1'b0;
-                end
-                else
-                begin
-                    if ( comparator != 1'b0 )
+                reset <= 1'b0;
+                counter  <= 8'b0;
+                comparator <= 8'h0;
+                counter_divider  <= 8'b1;
+            end
+            else
+                if (pause_n && comparator != 1'b0)
+                    if (counter_divider < divider)
+                        counter_divider <= counter_divider + 1'b1;
+                    else
                     begin
-                        if (counter_divider < divider)
-                            counter_divider <= counter_divider + 1'b1;
-                        else
+                        counter_divider <= 8'b1;
+                        counter <= counter + 1'b1;
+                        if (counter >= comparator)
                         begin
-                            counter_divider <= 8'b1;
-                            if (counter > comparator)
-                                reset <= 1'b1;
-                            else
-                                reset <= 1'b0;
-                            counter <= counter + 1'b1;
+                            reset <= 1'b1;
+                            counter <= 8'h0;
+                            comparator <= 8'h0;
                         end
                     end
-                end
-            end
         end
     end
 endmodule
