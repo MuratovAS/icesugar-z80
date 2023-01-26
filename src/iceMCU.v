@@ -43,12 +43,11 @@ module iceMCU  #(
 	parameter RAM_LOC = 16'h8000
 ) (
 	input clk,
+	input clk_48m,
 	output uart_txd,
 	input uart_rxd,
 	output i2c_scl,
-	input i2c_sda_in,
-	output i2c_sda_out,
-	output i2c_sda_oen,
+	input i2c_sda,
     output spi_sclk,
 	output spi_mosi,
 	input  spi_miso,
@@ -112,6 +111,18 @@ module iceMCU  #(
 	wire        dma_wr_n;
 	wire        wdt_reset;
 	wire        irq_int_n;
+
+	//i2c
+	wire	i2c_sda_oen;
+	wire	i2c_sda_out;
+	wire	i2c_sda_in;
+
+	tristate i2c_sda_buffer(
+		.pin(i2c_sda),
+		.enable(i2c_sda_oen),
+		.data_in(i2c_sda_in),
+		.data_out(i2c_sda_out)
+	);
 
 	//Reset Controller:
 	always @(posedge clk) begin
@@ -345,4 +356,21 @@ module iceMCU  #(
 		$display("RAM type = %d", RAM_TYPE );
 	end
 
+endmodule
+
+module tristate(
+  inout pin,
+  input enable,
+  input data_out,
+  output data_in
+);
+  SB_IO #(
+    .PIN_TYPE(6'b1010_01) // tristatable output
+	//.PULLUP(1'b 0)
+  ) buffer(
+    .PACKAGE_PIN(pin),
+    .OUTPUT_ENABLE(enable),
+    .D_IN_0(data_in),
+    .D_OUT_0(data_out)
+  );
 endmodule

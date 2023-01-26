@@ -28,7 +28,7 @@ ARCH = mz80
 # ----------------------------------------------------------------------------------
 
 FORMAT = "verilog-format"
-TOOLCHAIN_PATH = /opt/fpga
+TOOLCHAIN_PATH = /opt/fpga-z80
 BUILD_DIR = build
 #Creates a temporary PATH.
 TOOLCHAIN_PATH := $(shell echo $$(readlink -f $(TOOLCHAIN_PATH)))

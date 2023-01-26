@@ -55,8 +55,8 @@ module top(
 	output DEBUG_6,
 	output DEBUG_7
 );
-
-	wire clk;
+	wire clk_48m;
+	wire clk_12m;
 
 	wire[7:0] P1_out;
 	wire[7:0] P2_out;
@@ -70,7 +70,7 @@ module top(
 
 	reg LED_R, LED_G, LED_B;
 
-    always @(posedge clk)
+    always @(posedge clk_12m)
     begin
 		LED_R <= !P1_out[0];
 		LED_G <= !P1_out[1];
@@ -80,25 +80,40 @@ module top(
 	assign SW = {SW_4, SW_3, SW_2, SW_1};
 	assign DEBUG = {DEBUG_7, DEBUG_6, DEBUG_5, DEBUG_4, DEBUG_3, DEBUG_2, DEBUG_1, DEBUG_0};
 
+	//internal oscillators seen as modules
 	//Source = 48MHz, CLKHF_DIV = 2’b00 : 00 = div1, 01 = div2, 10 = div4, 11 = div8 ; Default = “00”
-	SB_HFOSC #(.CLKHF_DIV("0b10")) osc (
-		.CLKHFPU(1'b1),
-		.CLKHFEN(1'b1),
-		.CLKHF(clk)
+	//SB_HFOSC SB_HFOSC_inst(
+	SB_HFOSC #(.CLKHF_DIV("0b10")) SB_HFOSC_inst (
+		.CLKHFEN(1),
+		.CLKHFPU(1),
+		.CLKHF(clk_12m)
 	);
 
-	SB_IO #(
-		.PIN_TYPE(6'b 1010_01),
-		.PULLUP(1'b 0)
-	) i2c_sda_pin (
-		.PACKAGE_PIN(i2c_sda),
-		.OUTPUT_ENABLE(i2c_sda_oen),
-		.D_OUT_0(i2c_sda_out),
-		.D_IN_0(i2c_sda_in)
-	);
+	//10khz used for low power applications (or sleep mode)
+	/*SB_LFOSC SB_LFOSC_inst(
+		.CLKLFEN(1),
+		.CLKLFPU(1),
+		.CLKLF(clk_10k)
+	);*/
+	
+	// toolchain-ice40/bin/icepll
+	SB_PLL40_CORE #(
+      .FEEDBACK_PATH("SIMPLE"),
+      .PLLOUT_SELECT("GENCLK"),
+      .DIVR(4'b0000),
+      .DIVF(7'b0001111),
+      .DIVQ(3'b101),
+      .FILTER_RANGE(3'b100),
+    ) SB_PLL40_CORE_inst (
+      .RESETB(1'b1),
+      .BYPASS(1'b0),
+      .PLLOUTCORE(clk_48m),
+      .REFERENCECLK(clk_12m)
+   );
 
 	iceMCU core (
-		.clk		(clk),
+		.clk		(clk_12m),
+		.clk_48m	(clk_48m),
 		.uart_txd	(uart_txd),
 		.uart_rxd	(uart_rxd),
     	.spi_cs		(spi_cs),
@@ -106,9 +121,7 @@ module top(
 		.spi_mosi	(spi_mosi),
 		.spi_miso	(spi_miso),
 		.i2c_scl	(i2c_scl),
-		.i2c_sda_in	(i2c_sda_in),
-		.i2c_sda_out	(i2c_sda_out),
-		.i2c_sda_oen	(i2c_sda_oen),
+		.i2c_sda	(i2c_sda),
 		.PA_out		(P1_out),
 		.PA_in		(8'h55),
 		.PA_oen		(),
