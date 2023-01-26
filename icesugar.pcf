@@ -1,3 +1,7 @@
+set_io pin_usbp     10
+set_io pin_usbn     9
+set_io pin_pu       11
+
 set_io uart_rxd 4
 set_io uart_txd 6
 

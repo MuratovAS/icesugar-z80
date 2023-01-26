@@ -37,6 +37,10 @@ module top(
 	output i2c_scl,
 	inout i2c_sda,
 	
+	inout  pin_usbp,
+	inout  pin_usbn,
+	output pin_pu,
+
 	output LED_R,
 	output LED_G,
 	output LED_B,
@@ -101,9 +105,9 @@ module top(
       .FEEDBACK_PATH("SIMPLE"),
       .PLLOUT_SELECT("GENCLK"),
       .DIVR(4'b0000),
-      .DIVF(7'b0001111),
-      .DIVQ(3'b101),
-      .FILTER_RANGE(3'b100),
+      .DIVF(7'b0111111),
+      .DIVQ(3'b100),
+      .FILTER_RANGE(3'b001),
     ) SB_PLL40_CORE_inst (
       .RESETB(1'b1),
       .BYPASS(1'b0),
@@ -122,6 +126,9 @@ module top(
 		.spi_miso	(spi_miso),
 		.i2c_scl	(i2c_scl),
 		.i2c_sda	(i2c_sda),
+		.pin_usbp	(pin_usbp),
+		.pin_usbn	(pin_usbn),
+		.pin_pu		(pin_pu),
 		.PA_out		(P1_out),
 		.PA_in		(8'h55),
 		.PA_oen		(),

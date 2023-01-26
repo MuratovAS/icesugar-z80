@@ -29,6 +29,7 @@
 `include "src/simplei2c_wrapper.v"
 `include "src/simplespi_wrapper.v"
 `include "src/simpleuart_wrapper.v"
+`include "src/simpleusb_wrapper.v"
 `include "src/simpleio.v"
 `include "src/simpleirq.v"
 `include "src/simpledma.v"
@@ -52,6 +53,9 @@ module iceMCU  #(
 	output spi_mosi,
 	input  spi_miso,
     output spi_cs,
+	inout  pin_usbp,
+	inout  pin_usbn,
+	output pin_pu,
     output[7:0] PA_out,
     input[7:0] PA_in,
     output PA_oen,
@@ -91,6 +95,7 @@ module iceMCU  #(
 	wire [7:0] data_miso_rom;
 	wire [7:0] data_miso_ram;
 	wire [7:0] data_miso_io;
+	wire [7:0] data_miso_usb;
 	wire [7:0] data_miso_uart;
 	wire [7:0] data_miso_i2c;
 	wire [7:0] data_miso_spi;
@@ -124,6 +129,34 @@ module iceMCU  #(
 		.data_out(i2c_sda_out)
 	);
 
+	// usb
+	wire usb_p_tx;
+	wire usb_n_tx;
+	wire usb_p_rx;
+	wire usb_n_rx;
+	wire usb_tx_en;
+
+	wire usb_p_rx_io;
+	wire usb_n_rx_io;
+
+	assign pin_pu = 1'b1;
+	assign usb_p_rx = usb_tx_en ? 1'b1 : usb_p_rx_io;
+	assign usb_n_rx = usb_tx_en ? 1'b0 : usb_n_rx_io;
+
+	tristate usbn_buffer(
+		.pin(pin_usbn),
+		.enable(usb_tx_en),
+		.data_in(usb_n_rx_io),
+		.data_out(usb_n_tx)
+	);
+
+	tristate usbp_buffer(
+		.pin(pin_usbp),
+		.enable(usb_tx_en),
+		.data_in(usb_p_rx_io),
+		.data_out(usb_p_tx)
+	);
+
 	//Reset Controller:
 	always @(posedge clk) begin
 		if( reset_n == 1'b0 ) 
@@ -137,7 +170,7 @@ module iceMCU  #(
 	end
 
 	//bus
-	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_io |
+	assign data_miso = data_miso_rom  | data_miso_ram | data_miso_io | data_miso_usb |
 			data_miso_uart | data_miso_i2c | data_miso_spi | data_miso_irq | data_miso_dma | data_miso_wdt;
 
 	assign data_mosi = busak_n ? cpu_data_mosi : dma_data_mosi;
@@ -152,16 +185,17 @@ module iceMCU  #(
 	assign int_n = sys_int_n & irq_int_n;
 
 	//Decoder:
-	wire uart_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n, wdt_cs_n;
+	wire uart_cs_n, usb_cs_n, port_cs_n, i2c_cs_n, spi_cs_n, dma_cs_n, wdt_cs_n;
 	wire irq_en_n, dma_trig_n;
 	wire rom_cs_n, ram_cs_n;
 	//I/O Address
+	assign wdt_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00001)); // WDT base 0x8
 	assign uart_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00011)); // UART base 0x18
 	assign port_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01000)); // PORT base 0x40
-	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // i2c base 0x50
-	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // spi base 0x60
-	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // dma base 0x70
-	assign wdt_cs_n = ~(!iorq_n & (addr[7:3] == 5'b00001)); // WDT base 0x8
+	assign i2c_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01010)); // I2C base 0x50
+	assign spi_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01100)); // SPI base 0x60
+	assign dma_cs_n = ~(!iorq_n & (addr[7:3] == 5'b01110)); // DMA base 0x70
+	assign usb_cs_n = ~(!iorq_n & (addr[7:3] == 5'b10000)); // USB base 0x80
 	//Memory Address
 	assign rom_cs_n = ~(!mreq_n & (addr  < ROM_SIZE));
 	assign ram_cs_n = ~(!mreq_n & (addr >= RAM_LOC) & (addr < (RAM_LOC+RAM_SIZE)));
@@ -302,6 +336,24 @@ module iceMCU  #(
 		.PB_out		(PB_out),
 		.PB_in		(PB_in),
 		.PB_oen		(PB_oen)
+	);
+
+	simpleusb_wrapper usb
+	(
+		.clk		(clk),
+		.clk_48m	(clk_48m),
+		.reset_n	(reset_n),
+		.data_out	(data_miso_usb),
+		.data_in	(data_mosi),
+		.cs_n		(usb_cs_n),
+		.rd_n		(rd_n),
+		.wr_n		(wr_n),
+		.addr		(addr[2:0]),
+		.usb_p_tx	(usb_p_tx),
+		.usb_n_tx	(usb_n_tx),
+		.usb_p_rx	(usb_p_rx),
+		.usb_n_rx	(usb_n_rx),
+		.usb_tx_en	(usb_tx_en)
 	);
 
 	simpleuart_wrapper uart0

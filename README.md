@@ -10,6 +10,7 @@ This project is based on the developments of [iceZ0mb1e](https://github.com/abno
 
 Distinctive Features:
  - DMA
+ - USB ( :( Max frequency for clock 'clk_48m': 32.92 MHz)
  - IRQ
  - GPIO
  - WDT

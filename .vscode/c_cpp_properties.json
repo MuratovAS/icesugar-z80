@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "firmware/include",
-                "/opt/fpga/sdcc-4.0.0/share/sdcc/include/**"
+                "/opt/fpga-z80/sdcc-4.0.0/share/sdcc/include/**"
             ],
             "defines": [
                 "__interrupt=/**/",

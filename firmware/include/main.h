@@ -75,4 +75,9 @@ __sfr __at 0x74 dma_addAH;
 __sfr __at 0x75 dma_addBL;
 __sfr __at 0x76 dma_addBH;
 
+__sfr __at 0x80 usb_status;
+__sfr __at 0x81 usb_cmd;
+__sfr __at 0x82 usb_dat_in;
+__sfr __at 0x83 usb_dat_out;
+
 #endif
