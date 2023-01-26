@@ -36,7 +36,6 @@ module top(
 	
 	output i2c_scl,
 	inout i2c_sda,
-	output oled_rst,
 	
 	output LED_R,
 	output LED_G,
@@ -70,14 +69,12 @@ module top(
 	wire i2c_sda_oen;
 
 	reg LED_R, LED_G, LED_B;
-	reg oled_rst;
 
     always @(posedge clk)
     begin
 		LED_R <= !P1_out[0];
 		LED_G <= !P1_out[1];
 		LED_B <= !P1_out[2];
-		oled_rst <= P2_out[0];
 	end
 
 	assign SW = {SW_4, SW_3, SW_2, SW_1};

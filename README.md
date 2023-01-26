@@ -18,8 +18,8 @@ Distinctive Features:
  - Embedded toolchain
 
 Other functions:
- - I2C
- - SPI
+ - I2C  (software)
+ - SPI  (software)
  - UART
  - BRAM
  - SPRAM
