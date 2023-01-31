@@ -28,7 +28,7 @@ ARCH = mz80
 # ----------------------------------------------------------------------------------
 
 FORMAT = "verilog-format"
-TOOLCHAIN_PATH = /opt/fpga-z80
+TOOLCHAIN_PATH = /opt/fpga
 BUILD_DIR = build
 #Creates a temporary PATH.
 TOOLCHAIN_PATH := $(shell echo $$(readlink -f $(TOOLCHAIN_PATH)))
@@ -67,8 +67,8 @@ prog: $(BUILD_DIR)/$(PROJ).bin
 	$(PROGRAMMER) -S $<
 
 formatter:
-	if [ $(FORMAT) == "istyle" ]; then istyle  -t4 -b -o --pad=block $(FPGA_SRC)/*.v; fi
-	if [ $(FORMAT) == "verilog-format" ]; then find ./src/*.v | xargs -t -L1 java -jar ${TOOLCHAIN_PATH}/verilog-format/bin/verilog-format.jar -s .verilog-format -f ; fi
+	if [ $(FORMAT) == "istyle" ]; then istyle-verilog-formatter  -t4 -b -o --pad=block $(FPGA_SRC)/*.v; fi
+	if [ $(FORMAT) == "verilog-format" ]; then find ./src/*.v | xargs -t -L1 java -jar ${TOOLCHAIN_PATH}/utils/bin/verilog-format.jar -s .verilog-format -f ; fi
 	
 #FIXME:
 build_fw: $(BUILD_DIR)/$(PROJ)_fw.bin $(BUILD_DIR)/$(PROJ)_fw.hex $(BUILD_DIR)/$(PROJ)_fw.vhex
@@ -99,11 +99,9 @@ clean:
 	rm -f $(BUILD_DIR)/*
 
 toolchain:
-	chmod +x ./toolchain/*.sh
-	sudo ./toolchain/install.sh $(TOOLCHAIN_PATH)
-	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.path\":\)[^,]*@\1 "${TOOLCHAIN_PATH}/toolchain-iverilog/bin/"@' .vscode/settings.json; fi
-	if [ -d ".vscode" ]; then sed -i 's@\(\"verilog.linting.iverilog.arguments\":\)[^,]*@\1 "-B ${TOOLCHAIN_PATH}/toolchain-iverilog/lib/ivl ${TOOLCHAIN_PATH}/toolchain-yosys/share/yosys/ice40/cells_sim.v src/top.v"@' .vscode/settings.json; fi
-	if [ -d ".vscode" ]; then sed -i 's@[$$"].*/sdcc-4.0.0@"${TOOLCHAIN_PATH}/sdcc-4.0.0@' .vscode/c_cpp_properties.json; fi
+	curl https://raw.githubusercontent.com/MuratovAS/FPGACode-toolchain/main/toolchain.sh > ./toolchain.sh
+	chmod +x ./toolchain.sh
+	sudo ./toolchain.sh $(TOOLCHAIN_PATH)
 
 #secondary needed or make will remove useful intermediate files
 .SECONDARY:
