@@ -1,6 +1,6 @@
 # icesugar-z80
 
-[FPGACode-ide](https://github.com/MuratovAS/FPGACode-ide) -> [IceSugar-riscv](https://github.com/MuratovAS/icesugar-riscv) -> [**IceSugar-tv80**](https://github.com/MuratovAS/icesugar-z80)
+[FPGACode-ide](https://github.com/MuratovAS/FPGACode-ide) -> [IceSugar-riscv](https://github.com/MuratovAS/icesugar-riscv) -> [**IceSugar-tv80**](https://github.com/MuratovAS/icesugar-z80) -> [IceSugar-cc65](https://github.com/MuratovAS/toolchain-cc65)
 
 Here you will find a project for IceSugar implementing Z80.
 As well as full automation of assembly and testing.
@@ -43,9 +43,9 @@ make toolchain  #Install assembly tools
 ## Using IceSugar resources
 ```
 Info: Device utilisation:
-Info:            ICESTORM_LC:  3536/ 5280    66%
+Info:            ICESTORM_LC:  3618/ 5280    68%
 Info:           ICESTORM_RAM:    16/   30    53%
-Info:                  SB_IO:    24/   96    25%
+Info:                  SB_IO:    23/   96    23%
 Info:                  SB_GB:     8/    8   100%
 Info:           ICESTORM_PLL:     0/    1     0%
 Info:            SB_WARMBOOT:     0/    1     0%
