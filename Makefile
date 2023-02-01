@@ -4,13 +4,14 @@ PACKAGE = sg48
 DEVICE = up5k
 SERIES = synth_ice40
 YOSYS_ARG = -dsp -abc2
-ROUTE_ARG = --seed 10 --freq 12
+ROUTE_ARG = --seed 10
 PROGRAMMER = icesprog
 
 # ----------------------------------------------------------------------------------
 
 FPGA_SRC = ./src
 PIN_DEF = ./icesugar.pcf
+SDC = ./clock.sdc
 TOP_FILE = $(shell echo $(FPGA_SRC)/top.v)
 TB_FILE :=  $(shell echo $(FPGA_SRC)/*_tb.v)
 
@@ -42,7 +43,7 @@ $(BUILD_DIR)/%.json: $(TOP_FILE) build_fw $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
 	yosys -q  -f "verilog -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fw.vhex\"" -l $(BUILD_DIR)/build.log -p '$(SERIES) $(YOSYS_ARG) -top top -json $@; show -format dot -prefix $(BUILD_DIR)/$(PROJ)' $< 
 # asc
 $(BUILD_DIR)/%.asc: $(BUILD_DIR)/%.json $(PIN_DEF)
-	nextpnr-ice40 -l $(BUILD_DIR)/nextpnr.log $(ROUTE_ARG) --package $(PACKAGE) --$(DEVICE) --asc $@ --pcf $(PIN_DEF) --json $<
+	nextpnr-ice40 -l $(BUILD_DIR)/nextpnr.log $(ROUTE_ARG) --package $(PACKAGE) --$(DEVICE) --asc $@  --pre-pack $(SDC) --pcf $(PIN_DEF) --json $<
 # bin, for programming
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.asc
 	icepack $< $@
