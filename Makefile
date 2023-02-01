@@ -53,11 +53,11 @@ $(BUILD_DIR)/%.rpt: $(BUILD_DIR)/%.asc
 
 sim: build_fw $(BUILD_DIR)/%.vcd  
 $(BUILD_DIR)/%.vcd: $(BUILD_DIR)/$(PROJ).out 
-	vvp -v -M $(TOOLCHAIN_PATH)/toolchain-iverilog/lib/ivl $< 
+	vvp -v -M $(TOOLCHAIN_PATH)/tools-oss-cad-suite/lib/ivl $< 
 	mv ./*.vcd $(BUILD_DIR)
 
 $(BUILD_DIR)/%.out: $(FPGA_SRC)/*.v $(FPGA_SRC)/tv80/*.v
-	iverilog -o $@ -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fb.vhex\" -B $(TOOLCHAIN_PATH)/toolchain-iverilog/lib/ivl $(TOOLCHAIN_PATH)/toolchain-yosys/share/yosys/ice40/cells_sim.v $(TOP_FILE) $(TB_FILE)
+	iverilog -o $@ -DNO_ICE40_DEFAULT_ASSIGNMENTS -D__def_fw_img=\"$(BUILD_DIR)/$(PROJ)_fb.vhex\" -B $(TOOLCHAIN_PATH)/tools-oss-cad-suite/lib/ivl $(TOOLCHAIN_PATH)/tools-oss-cad-suite/share/yosys/ice40/cells_sim.v $(TOP_FILE) $(TB_FILE)
 
 # Flash memory firmware
 flash: $(BUILD_DIR)/$(PROJ).bin
