@@ -101,7 +101,7 @@ module top(
 	);*/
 	
 	// toolchain-ice40/bin/icepll
-	SB_PLL40_CORE #(
+	/*SB_PLL40_CORE #(
       .FEEDBACK_PATH("SIMPLE"),
       .PLLOUT_SELECT("GENCLK"),
       .DIVR(4'b0000),
@@ -113,7 +113,7 @@ module top(
       .BYPASS(1'b0),
       .PLLOUTCORE(clk_48m),
       .REFERENCECLK(clk_12m)
-   );
+   );*/
 
 	iceMCU core (
 		.clk		(clk_12m),

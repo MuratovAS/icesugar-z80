@@ -42,9 +42,7 @@ module tb_iceMCU;
     inout [7:0] PA_out;
     inout [7:0] PB_out;
 	wire i2c_scl;
-	wire i2c_sda_out;
-	wire i2c_sda_in;
-	wire i2c_sda_oen;
+	wire i2c_sda;
     output sclk, cs, mosi;
     input miso;
     wire rx = 0;
@@ -55,9 +53,7 @@ module tb_iceMCU;
         .uart_txd   (tx),
         .uart_rxd   (rx),
 		.i2c_scl	(i2c_scl),
-		.i2c_sda_in	(i2c_sda_in),
-		.i2c_sda_out	(i2c_sda_out),
-		.i2c_sda_oen	(i2c_sda_oen),
+		.i2c_sda	(i2c_sda),
     	.spi_sclk	(spi_sclk),
 		.spi_mosi	(spi_mosi),
 		.spi_miso	(spi_miso),
