@@ -6,7 +6,7 @@
 #FPGAwars/toolchain-fujprog				toolchain-fujprog-linux_x86_64-.*.tar.gz
 #FPGAwars/toolchain-dfu					toolchain-dfu-linux_x86_64-.*.tar.gz
 ###universal
-FPGAwars/tools-oss-cad-suite			tools-oss-cad-suite-linux_x86_64-.*.tar.gz
+FPGAwars/tools-oss-cad-suite			tools-oss-cad-suite-linux_x86_64-.*.tar.gz		tools-oss-cad-suite.tar.gz
 #FPGAwars/toolchain-iverilog				toolchain-iverilog-linux_x86_64-.*.tar.gz	toolchain-iverilog.tar.gz
 #FPGAwars/toolchain-yosys				toolchain-yosys-linux_x86_64-.*.tar.gz		toolchain-yosys.tar.gz
 ###other
