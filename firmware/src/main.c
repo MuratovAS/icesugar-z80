@@ -41,7 +41,7 @@ char strbuf[180];
 
 void main ()
 {
-    uint8_t buffer[64];
+    uint8_t buffer[64] = {0};
 
     //UART Test:
     uart_initialize(9600);
@@ -58,10 +58,11 @@ void main ()
 
     //SPI Test // 25L008A
     spi_config(0, 12); //1MHz
+    spi_xfer_single(0xAB);
     uint16_t len = 64;
-    uint8_t spi_send[4] = {0x3, 0x00, 0x00, 0x00};
+    uint8_t spi_send[4] = {0x03, 0x00, 0x00, 0x00};
     spi_xfer(spi_send, buffer, 4, len);
-    viewMemory(buffer, 64);
+    viewMemory(buffer, len);
 
     //Port test
     gpio_conf(PORTA,OUTPUT);
